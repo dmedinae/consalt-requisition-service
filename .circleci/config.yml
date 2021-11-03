@@ -1,0 +1,81 @@
+version: 2.1
+
+defaults: &defaults
+  docker:
+    - image: circleci/node:14.18
+  resource_class: small
+  working_directory: ~/repo
+
+commands:
+  serverless-deploy-config:
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-
+
+      - run:
+          name: Create .npmrc
+          command: |
+            echo "@inlaweb:registry=${registry}" >> .npmrc
+            echo "_auth = ${auth}" >> .npmrc
+            echo "email = ${email}" >> .npmrc
+            echo "always-auth = true" >> .npmrc
+            cat .npmrc
+
+      - run:
+          name: Install Serverless CLI
+          command: sudo npm i -g serverless@2.62.0
+
+      - run:
+          name: Install  dependencies
+          command: npm install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-
+
+      - run:
+          name: Serverless config credentials
+          command: serverless config credentials --provider aws --key ${aws_access_key_id} --secret ${aws_secret_access_key}
+
+workflows:
+  deploy:
+    jobs:
+      - deploy-dev:
+          context:
+            - Inlaweb
+          filters:
+            branches:
+              only:
+                - 'develop'
+      - deploy-prod:
+          context:
+            - Inlaweb
+          filters:
+            branches:
+              only:
+                - 'master'
+
+jobs:
+  deploy-dev:
+    <<: *defaults
+
+    steps:
+      - serverless-deploy-config
+
+      - run:
+          name: Deploy application
+          command: sls deploy --stage dev
+  deploy-prod:
+    <<: *defaults
+
+    steps:
+      - serverless-deploy-config
+
+      - run:
+          name: Deploy application
+          command: sls deploy --stage prod
+

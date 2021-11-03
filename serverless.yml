@@ -1,0 +1,95 @@
+service: consalt-requisition-service
+
+plugins:
+  - serverless-prune-plugin
+  - serverless-plugin-optimize
+  - serverless-plugin-log-retention
+  - serverless-plugin-resource-tagging
+
+package:
+  individually: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage}
+  region: us-east-1
+  timeout: 10
+  memorySize: 512
+  lambdaHashingVersion: "20201221"
+  stackTags:
+    "serverless:company": consalt
+    "serverless:service": consalt-requisition-service
+    "serverless:stage": ${opt:stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+          Resource:
+            - 'Fn::ImportValue': consalt-${self:provider.stage}-DBARN
+            - 'Fn::ImportValue': consalt-audit-${self:provider.stage}-DBARN
+            - 'Fn::ImportValue': consalt-permission-${self:provider.stage}-DBARN
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+          Resource:
+            - 'Fn::ImportValue': consalt-${self:provider.stage}-DBIndexARN
+            - 'Fn::ImportValue': consalt-permission-${self:provider.stage}-DBIndexARN
+        - Effect: Allow
+          Action:
+            - s3:*
+          Resource: "arn:aws:s3:::${self:provider.stage}-consalt-files/*"
+  deploymentBucket:
+    name: ${self:provider.stage}-serverless-stacks
+  httpApi:
+    id:
+      'Fn::ImportValue': consalt-${self:provider.stage}-ApiID
+  environment:
+    TABLE_ARN:
+      'Fn::ImportValue': consalt-${self:provider.stage}-DBARN
+    TABLE_NAME:
+      'Fn::ImportValue': consalt-${self:provider.stage}-DBName
+    TABLE_PERMISSIONS_ARN:
+      'Fn::ImportValue': consalt-permission-${self:provider.stage}-DBARN
+    TABLE_PERMISSIONS_NAME:
+      'Fn::ImportValue': consalt-permission-${self:provider.stage}-DBName
+    TABLE_AUDIT_ARN:
+      'Fn::ImportValue': consalt-audit-${self:provider.stage}-DBARN
+    TABLE_AUDIT_NAME:
+      'Fn::ImportValue': consalt-audit-${self:provider.stage}-DBName
+    POOL_ID:
+      'Fn::ImportValue': consalt-${self:provider.stage}-Pool-ID
+    APP_ID:
+      'Fn::ImportValue': consalt-${self:provider.stage}-APP-ID
+    BUCKET_NAME: ${self:provider.stage}-consalt-files
+    LOG_LEVEL: debug
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+
+functions:
+  create:
+    handler:  src/functions/create/handler.create
+    description: Microservice for creation of a personal
+    events:
+      - httpApi:
+          path: /v1/requisition
+          method: put
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
+resources:
+  Description: functions stack for the requisition service
+
+custom:
+    logRetentionInDays: 14
+    optimize:
+      global: true
+
+    prune:
+      automatic: true
+      number: 1
