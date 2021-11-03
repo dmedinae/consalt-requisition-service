@@ -53,17 +53,28 @@ class Service extends BaseObject {
 
             const PK = body.PK;
 
-            let PKITEM = await this.dao.getId(this.table, Constants.ENTITY_ITRQ, body.items.length);
+            // Se obtienen los items a crear
+            const itemsForCreate = body.items.filter(item => !item.SK);
+            let PKITEM = itemsForCreate.length ? await this.dao.getId(this.table, Constants.ENTITY_ITRQ, itemsForCreate.length) : undefined;
+
+            const processItems = {};
 
             // Se validan los items y se crean las operaciones en lotes de 10
             let itemsPromises = [];
             for (let i = 0; i < body.items.length; i++) {
-                body.items[i].SK = `${Constants.ENTITY_ITRQ}${PKITEM}`;
-                itemsPromises.push(
-                    this.createItemOperation(body.items[i], PK).catch()
-                )
-                PKITEM++;
-                if (itemsPromises.length >= 10 || i === (body.items.length - 1)) {
+                if (!body.items[i].SK || !processItems[body.items[i].SK]) {
+                    processItems[body.items[i].SK] = 1;
+                    if (body.items[i].SK) {
+                        transactionOperations.push(this.createItemUpdateOperation(body.items[i], PK))
+                    } else {
+                        body.items[i].SK = `${Constants.ENTITY_ITRQ}${PKITEM}`;
+                        itemsPromises.push(
+                            this.createItemOperation(body.items[i], PK)
+                        )
+                        PKITEM++;
+                    }
+                }
+                if (itemsPromises.length && itemsPromises.length >= 10 || i === (body.items.length - 1)) {
                     const resultItems = await Promise.all(itemsPromises).catch(error => {
                         this.createLog("error", "Service error", error);
                         throw this.createResponse("INVALID_REQUEST", null, {});
@@ -73,11 +84,21 @@ class Service extends BaseObject {
                 }
             }
 
+            // Se eliminan los items removidos
+            const inItems = Object.keys(processItems);
+            // Se agrega la PK de la remisión para removerla de los items a eliminar
+            inItems.push(PK);
+            for (let element of currentRequisition) {
+                if (!inItems.includes(element.SK)) {
+                    transactionOperations.push({ Delete: { TableName: this.table, Key: { PK, SK: element.SK } } });
+                }
+            }
+
             // Se construye el encabezado
-            transactionOperations.push({ Put: { TableName: this.table, Item: this.createRequisitionObject(body, PK) } })
+            transactionOperations.push(this.createRequisitionObject(body))
 
             await this.dao.writeTransactions(transactionOperations, 24);
-            await this.dao.audit(Constants.ENTITY, PK, "CREATE");
+            await this.dao.audit(Constants.ENTITY, PK, "UPDATE");
 
             let url;
 
@@ -105,6 +126,17 @@ class Service extends BaseObject {
      * @param {object} payload - Data of the user.
      * @return {object} Dynamo object with the data to save.
      */
+    createItemUpdateOperation(item, PK) {
+        const itemUpdate = { quantity: item.quantity };
+        const setAttributes = Object.keys(item);
+        return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
+    }
+
+    /**
+     * Function to format the data to save in DDB.
+     * @param {object} payload - Data of the user.
+     * @return {object} Dynamo object with the data to save.
+     */
     async createItemOperation(item, PK) {
         //Se valida el item
         const itemCoding = await this.dao.get(this.table, item.item, item.item);
@@ -119,9 +151,8 @@ class Service extends BaseObject {
      * @param {object} payload - Data of the user.
      * @return {object} Dynamo object with the data to save.
      */
-     createItemObject(PK, item) {
+    createItemObject(PK, item) {
         const creationDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
-
         return {
             PK: PK,
             SK: item.SK,
@@ -138,22 +169,15 @@ class Service extends BaseObject {
      * @param {object} payload - Data of the user.
      * @return {object} Dynamo object with the data to save.
      */
-     createRequisitionObject(payload, PK) {
-        const creationDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
-
-        return {
-            PK: PK,
-            SK: PK,
-            entity: Constants.ENTITY,
-            project: payload.project,
+    createRequisitionObject(payload) {
+        const item = {
             requireDate: payload.requireDate,
-            identification: payload.employeeId,
             motive: payload.motive,
             observations: payload.observations,
             fileExtension: payload.fileExtension,
-            creationUser: this.tokenData["cognito:username"],
-            creationDate: creationDate,
         };
+        const setAttributes = Object.keys(item);
+        return this.dao.createUpdateParams(this.table, payload.PK, payload.PK, item, setAttributes);
     }
 }
 

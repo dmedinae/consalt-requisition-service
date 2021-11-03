@@ -142,7 +142,6 @@ class Service extends BaseObject {
             entity: Constants.ENTITY,
             project: payload.project,
             requireDate: payload.requireDate,
-            identification: payload.employeeId,
             motive: payload.motive,
             observations: payload.observations,
             fileExtension: payload.fileExtension,
