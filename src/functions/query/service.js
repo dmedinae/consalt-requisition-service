@@ -118,8 +118,8 @@ class Service extends BaseObject {
             if (body.creationUser && body.project) {
                 value = `${body.project}|${body.creationUser}|`;
             } else if (body.creationUser) {
-                let index = "GSI2";
-                let relation = "relation2";
+                index = "GSI2";
+                relation = "relation2";
                 value = `${body.creationUser}|`;
             } else if (body.project) {
                 value = `${body.project}|`;
