@@ -1,0 +1,74 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "remissionQueryRQ",
+    "type": "object",
+    "oneOf": [
+        {
+            "properties": {
+                "PK": {
+                    "type": "string",
+                    "pattern": "^REQI[0-9]+$",
+                    "maxLength": 11
+                }
+            },
+            "additionalProperties": false,
+            "required": ["PK"]
+        },
+        {
+            "properties": {
+                "typeSearch": {
+                    "enum": ["S", "R"]
+                },
+                "creationUser": {
+                    "type": "string",
+                    "pattern": "^PERR[0-9]+$",
+                    "maxLength": 11
+                },
+                "project": {
+                    "type": "string",
+                    "pattern": "^PROJ[0-9]+$",
+                    "maxLength": 11
+                },
+                "startDate": {
+                    "type": "string",
+                    "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2}(?:\\.\\d*)?)((-(\\d{2}):(\\d{2})|Z)?)$"
+                },
+                "finishDate": {
+                    "type": "string",
+                    "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2}(?:\\.\\d*)?)((-(\\d{2}):(\\d{2})|Z)?)$"
+                }
+            },
+            "minProperties": 2,
+            "additionalProperties": false,
+            "required": ["typeSearch"]
+        },
+        {
+            "properties": {
+                "type": {
+                    "enum": ["REQI", "ITRQ"]
+                },
+                "creationUser": {
+                    "type": "string",
+                    "pattern": "^PERR[0-9]+$",
+                    "maxLength": 11
+                },
+                "project": {
+                    "type": "string",
+                    "pattern": "^PROJ[0-9]+$",
+                    "maxLength": 11
+                },
+                "startDate": {
+                    "type": "string",
+                    "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2}(?:\\.\\d*)?)((-(\\d{2}):(\\d{2})|Z)?)$"
+                },
+                "finishDate": {
+                    "type": "string",
+                    "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2}(?:\\.\\d*)?)((-(\\d{2}):(\\d{2})|Z)?)$"
+                }
+            },
+            "minProperties": 2,
+            "additionalProperties": false,
+            "required": ["type"]
+        }
+    ]
+}

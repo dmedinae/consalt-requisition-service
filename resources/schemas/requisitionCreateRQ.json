@@ -43,5 +43,5 @@
         }
     },
     "additionalProperties": false,
-    "required": ["project", "requireDate", "observations", "items"]
+    "required": ["project", "requireDate", "motive", "items"]
 }

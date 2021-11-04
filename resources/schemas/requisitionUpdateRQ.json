@@ -47,5 +47,5 @@
         }
     },
     "additionalProperties": false,
-    "required": ["PK", "requireDate", "observations", "items"]
+    "required": ["PK", "requireDate", "motive", "items"]
 }

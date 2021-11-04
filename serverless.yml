@@ -84,12 +84,34 @@ functions:
             id:
               "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
 
+  query:
+    handler:  src/functions/query/handler.query
+    description: Microservice for query the requisition entity
+    events:
+      - httpApi:
+          path: /v1/requisition
+          method: post
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
   update:
     handler:  src/functions/update/handler.update
     description: Microservice for update a requisition
     events:
       - httpApi:
           path: /v1/requisition
+          method: patch
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
+  update-status:
+    handler:  src/functions/update-status/handler.updateStatus
+    description: Microservice for update the requisition status
+    events:
+      - httpApi:
+          path: /v1/requisition/update-status
           method: patch
           authorizer:
             id:

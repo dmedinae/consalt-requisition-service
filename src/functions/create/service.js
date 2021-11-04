@@ -72,7 +72,7 @@ class Service extends BaseObject {
                 body.items[i].relation3 = body.relation3;
                 body.items[i].relation4 = body.relation4;
                 itemsPromises.push(
-                    this.createItemOperation(body.items[i], PK).catch()
+                    this.createItemOperation(body.items[i], PK)
                 )
                 PKITEM++;
                 if (itemsPromises.length >= 5 || i === (body.items.length - 1)) {
@@ -170,10 +170,10 @@ class Service extends BaseObject {
             PK: PK,
             SK: PK,
             entity: Constants.ENTITY,
-            relation1: body.relation1,
-            relation2: body.relation2,
-            relation3: body.relation3,
-            relation4: body.relation4,
+            relation1: payload.relation1,
+            relation2: payload.relation2,
+            relation3: payload.relation3,
+            relation4: payload.relation4,
             project: payload.project,
             projectName: payload.projectName,
             requireDate: payload.requireDate,

@@ -60,6 +60,17 @@ class Service extends BaseObject {
 
             const PK = body.PK;
 
+            // Se obtiene el header
+            const header = currentRequisition.filter(element => element.PK === element.SK)[0];
+            if(!Constants.ALLOWED_UPDATE_STATUS.includes(header.status)) {
+                throw this.createResponse("INVALID_REQUEST", null, {});
+            }
+            // Se completan datos en el header
+            body.relation1 = header.relation1.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
+            body.relation2 = header.relation2.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
+            body.relation3 = header.relation3.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
+            body.relation4 = header.relation4.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
+
             // Se obtienen los items a crear
             const itemsForCreate = body.items.filter(item => !item.SK);
             let PKITEM = itemsForCreate.length ? await this.dao.getId(this.table, Constants.ENTITY_ITRQ, itemsForCreate.length) : undefined;
@@ -71,6 +82,10 @@ class Service extends BaseObject {
             for (let i = 0; i < body.items.length; i++) {
                 if (!body.items[i].SK || !processItems[body.items[i].SK]) {
                     processItems[body.items[i].SK] = 1;
+                    body.items[i].relation1 = body.relation1;
+                    body.items[i].relation2 = body.relation2;
+                    body.items[i].relation3 = body.relation3;
+                    body.items[i].relation4 = body.relation4;
                     if (body.items[i].SK) {
                         transactionOperations.push(this.createItemUpdateOperation(body.items[i], PK))
                     } else {
@@ -134,7 +149,13 @@ class Service extends BaseObject {
      * @return {object} Dynamo object with the data to save.
      */
     createItemUpdateOperation(item, PK) {
-        const itemUpdate = { quantity: item.quantity };
+        const itemUpdate = {
+            relation1: item.relation1,
+            relation2: item.relation2,
+            relation3: item.relation3,
+            relation4: item.relation4,
+            quantity: item.quantity
+        };
         const setAttributes = Object.keys(item);
         return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
     }
@@ -150,6 +171,12 @@ class Service extends BaseObject {
         if (!itemCoding) {
             throw this.createResponse("INVALID_REQUEST", null, {});
         }
+        item.family = itemCoding.family;
+        item.group = itemCoding.group;
+        item.code = itemCoding.code;
+        item.name = itemCoding.name;
+        item.unity = itemCoding.unityName;
+        item.value = itemCoding.unitValue;
         return { Put: { TableName: this.table, Item: this.createItemObject(PK, item) } };
     }
 
@@ -164,6 +191,10 @@ class Service extends BaseObject {
             PK: PK,
             SK: item.SK,
             entity: Constants.ENTITY_ITRQ,
+            relation1: item.relation1,
+            relation2: item.relation2,
+            relation3: item.relation3,
+            relation4: item.relation4,
             item: item.item,
             quantity: item.quantity,
             creationUser: this.tokenData["cognito:username"],
@@ -178,8 +209,13 @@ class Service extends BaseObject {
      */
     createRequisitionObject(payload) {
         const item = {
+            relation1: payload.relation1,
+            relation2: payload.relation2,
+            relation3: payload.relation3,
+            relation4: payload.relation4,
             requireDate: payload.requireDate,
             motive: payload.motive,
+            status: Constants.STATUS.PENDING_APPROVAL,
             observations: payload.observations,
             fileExtension: payload.fileExtension,
         };

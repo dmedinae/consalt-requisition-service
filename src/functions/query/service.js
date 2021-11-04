@@ -2,6 +2,8 @@
 
 const { BaseDao, BaseObject } = require("@inlaweb/base-node");
 const Constants = require("../../commons/constants/objects");
+const moment = require("moment-timezone");
+const S3 = require("aws-sdk").S3;
 
 /**
  * Service class.
@@ -13,9 +15,11 @@ class Service extends BaseObject {
      */
     constructor() {
         super();
+        this.s3 = new S3();
         this.dao = new BaseDao();
         this.table = process.env.TABLE_NAME;
         this.permissionTable = process.env.TABLE_PERMISSIONS_NAME;
+        this.bucketName = process.env.BUCKET_NAME;
         this.actions = [];
     }
 
@@ -41,6 +45,24 @@ class Service extends BaseObject {
                 });
             }
             let result = await this.dao.query(this.table, searchParameters);
+            // Si se consulta por PK y tiene adjunto se agrega
+            if (this.event.body.PK) {
+                let header = result.filter(item => item.SK === this.event.body.PK);
+                if (header[0] && header[0].fileExtension) {
+                    try {
+                        // Parametros para generar la URL firmada
+                        const params = {
+                            Bucket: this.bucketName,
+                            Key: `${Constants.ENTITY}/${this.event.body.PK}_${this.event.body.PK}.${header[0].fileExtension}`,
+                            Expires: 43200,
+                        };
+                        const url = await this.s3.getSignedUrlPromise("getObject", params);
+                        header[0].urlAtt = url;
+                    } catch (error) {
+                        this.createLog("error", "Service error getting de url file", error);
+                    }
+                }
+            }
             return this.createResponse("SUCCESS", result);
         } catch (error) {
             this.createLog("error", "Service error", error);
@@ -53,41 +75,57 @@ class Service extends BaseObject {
      * @return {object} The object with the config of the query.
      */
     createSearchParameters() {
+        const startDate = moment(this.event.body.startDate).format("YYYY-MM-DD");
+        const finishDate = moment(this.event.body.finishDate).add(1, "day").format("YYYY-MM-DD");
+        const body = this.event.body;
+        let entity = Constants.ENTITY;
         let searchParameters = {};
         this.actions = ["UPDATE", "PRINT"];
         searchParameters.projectionExpression = Constants.SEARCH_PROJECTION;
-        if (this.event.body.typeSearch === 'R') {
+        if (body.type) {
             this.actions = ["REPORT"];
-            searchParameters.projectionExpression = Constants.REPORT_PROJECTION;
+            entity = body.type;
+            searchParameters.projectionExpression = entity === Constants.ENTITY ? Constants.REPORT_PROJECTION : Constants.REPORT_ITEMS_PROJECTION;
         }
-        if (this.event.body.enterprise && this.event.body.startDate && this.event.body.finishDate) {
-            searchParameters.indexName = "GSI1";
+        if (body.startDate && body.finishDate) {
+            let index = "GSI1";
+            let relation = "relation1";
+            let project = "";
+            let creationUser = "";
+            if (body.creationUser && body.project) {
+                creationUser = `${body.creationUser}|`;
+                project = `${body.project}|`;
+            } else if (body.creationUser) {
+                index = "GSI2";
+                relation = "relation2";
+                creationUser = `${body.creationUser}|`;
+            } else if (body.project) {
+                project = `${body.project}|`;
+            }
+            searchParameters.indexName = index;
             searchParameters.parameters = [
-                { name: "entity", value: Constants.ENTITY, operator: "=" },
-                { name: "relation1", value: `${this.event.body.enterprise}|${this.event.body.startDate}`, value1: `${this.event.body.enterprise}|${this.event.body.finishDate}`, operator: "BETWEEN" },
+                { name: "entity", value: entity, operator: "=" },
+                { name: relation, value: `${startDate}|${project}${creationUser}`, value1: `${finishDate}|${project}`, operator: "BETWEEN" },
             ];
-        } else if (this.event.body.enterprise) {
-            searchParameters.indexName = "GSI1";
+        } else if (body.project || body.creationUser) {
+            let index = "GSI3";
+            let relation = "relation3";
+            let value = "";
+            if (body.creationUser && body.project) {
+                value = `${body.creationUser}|${body.project}|`;
+            } else if (body.creationUser) {
+                value = `${body.creationUser}|`;
+            } else if (body.project) {
+                index = "GSI4";
+                relation = "relation4";
+                value = `${body.project}|`;
+            }
+            searchParameters.indexName = index;
             searchParameters.parameters = [
-                { name: "entity", value: Constants.ENTITY, operator: "=" },
-                { name: "relation1", value: `${this.event.body.enterprise}|`, operator: "begins_with" },
-            ];
-        } else if (this.event.body.startDate && this.event.body.finishDate) {
-            searchParameters.indexName = "GSI2";
-            searchParameters.parameters = [
-                { name: "entity", value: Constants.ENTITY, operator: "=" },
-                { name: "relation2", value: `${this.event.body.startDate}`, value1: `${this.event.body.finishDate}`, operator: "BETWEEN" },
-            ];
-        } else if (this.event.body.id) {
-            this.actions = ["UPDATE", "PRINT"];
-            searchParameters.projectionExpression = Constants.SEARCH_PROJECTION;
-            searchParameters.indexName = "";
-            searchParameters.parameters = [
-                { name: "PK", value: `REMI${this.event.body.id}`, operator: "=" },
-                { name: "SK", value: `REMI${this.event.body.id}`, operator: "=" },
+                { name: "entity", value: entity, operator: "=" },
+                { name: relation, value: value, operator: "begins_with" },
             ];
         } else if (this.event.body.PK) {
-            this.actions = ["UPDATE", "PRINT"];
             searchParameters.projectionExpression = Constants.PK_PROJECTION;
             searchParameters.indexName = "";
             searchParameters.parameters = [{ name: "PK", value: this.event.body.PK, operator: "=" }];
