@@ -66,9 +66,6 @@ class Service extends BaseObject {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
             // Se completan datos en el header
-            body.relation1 = header.relation1.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
-            body.relation2 = header.relation2.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
-            body.relation3 = header.relation3.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
             body.relation4 = header.relation4.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
 
             // Se obtienen los items a crear
@@ -150,9 +147,6 @@ class Service extends BaseObject {
      */
     createItemUpdateOperation(item, PK) {
         const itemUpdate = {
-            relation1: item.relation1,
-            relation2: item.relation2,
-            relation3: item.relation3,
             relation4: item.relation4,
             quantity: item.quantity
         };

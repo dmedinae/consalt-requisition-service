@@ -53,10 +53,10 @@ class Service extends BaseObject {
             const creationDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
             body.projectName = project.name;
             body.creationDate = creationDate;
-            body.relation1 = `${creationDate}|${body.project}|${this.tokenData["custom:id"]}|${Constants.STATUS.PENDING_APPROVAL}`;
-            body.relation2 = `${creationDate}|${this.tokenData["custom:id"]}|${Constants.STATUS.PENDING_APPROVAL}`;
-            body.relation3 = `${this.tokenData["custom:id"]}|${body.project}|${Constants.STATUS.PENDING_APPROVAL}`;
-            body.relation4 = `${body.project}|${Constants.STATUS.PENDING_APPROVAL}`;
+            body.relation1 = `${body.project}|${this.tokenData["custom:id"]}|${creationDate}`;
+            body.relation2 = `${this.tokenData["custom:id"]}|${creationDate}`;
+            body.relation3 = `${creationDate}`;
+            body.relation4 = `${Constants.STATUS.PENDING_APPROVAL}|${body.project}`;
 
             const PK = await this.dao.getId(this.table, Constants.ENTITY);
 

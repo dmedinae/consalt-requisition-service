@@ -52,9 +52,6 @@ class Service extends BaseObject {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
             // Se completan datos en el header
-            body.relation1 = currentRequisition.relation1.replace(currentRequisition.status, body.status);
-            body.relation2 = currentRequisition.relation2.replace(currentRequisition.status, body.status);
-            body.relation3 = currentRequisition.relation3.replace(currentRequisition.status, body.status);
             body.relation4 = currentRequisition.relation4.replace(currentRequisition.status, body.status);
 
             // Se construye el encabezado
@@ -79,9 +76,6 @@ class Service extends BaseObject {
     createRequisitionObject(payload) {
         const approveDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
         const item = {
-            relation1: payload.relation1,
-            relation2: payload.relation2,
-            relation3: payload.relation3,
             relation4: payload.relation4,
             reason: payload.reason,
             status: payload.status,

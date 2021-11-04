@@ -88,11 +88,13 @@ class Service extends BaseObject {
             searchParameters.projectionExpression = entity === Constants.ENTITY ? Constants.REPORT_PROJECTION : Constants.REPORT_ITEMS_PROJECTION;
         }
         if (body.startDate && body.finishDate) {
-            let index = "GSI1";
-            let relation = "relation1";
+            let index = "GSI3";
+            let relation = "relation3";
             let project = "";
             let creationUser = "";
             if (body.creationUser && body.project) {
+                index = "GSI1";
+                relation = "relation1";
                 creationUser = `${body.creationUser}|`;
                 project = `${body.project}|`;
             } else if (body.creationUser) {
@@ -100,24 +102,26 @@ class Service extends BaseObject {
                 relation = "relation2";
                 creationUser = `${body.creationUser}|`;
             } else if (body.project) {
+                index = "GSI1";
+                relation = "relation1";
                 project = `${body.project}|`;
             }
             searchParameters.indexName = index;
             searchParameters.parameters = [
                 { name: "entity", value: entity, operator: "=" },
-                { name: relation, value: `${startDate}|${project}${creationUser}`, value1: `${finishDate}|${project}${creationUser}`, operator: "BETWEEN" },
+                { name: relation, value: `${project}${creationUser}${startDate}`, value1: `${project}${creationUser}${finishDate}`, operator: "BETWEEN" },
             ];
         } else if (body.project || body.creationUser) {
-            let index = "GSI3";
-            let relation = "relation3";
+            let index = "GSI1";
+            let relation = "relation1";
             let value = "";
             if (body.creationUser && body.project) {
-                value = `${body.creationUser}|${body.project}|`;
+                value = `${body.project}|${body.creationUser}|`;
             } else if (body.creationUser) {
+                let index = "GSI2";
+                let relation = "relation2";
                 value = `${body.creationUser}|`;
             } else if (body.project) {
-                index = "GSI4";
-                relation = "relation4";
                 value = `${body.project}|`;
             }
             searchParameters.indexName = index;
