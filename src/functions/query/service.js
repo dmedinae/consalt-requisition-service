@@ -105,7 +105,7 @@ class Service extends BaseObject {
             searchParameters.indexName = index;
             searchParameters.parameters = [
                 { name: "entity", value: entity, operator: "=" },
-                { name: relation, value: `${startDate}|${project}${creationUser}`, value1: `${finishDate}|${project}`, operator: "BETWEEN" },
+                { name: relation, value: `${startDate}|${project}${creationUser}`, value1: `${finishDate}|${project}${creationUser}`, operator: "BETWEEN" },
             ];
         } else if (body.project || body.creationUser) {
             let index = "GSI3";
