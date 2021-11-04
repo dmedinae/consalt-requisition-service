@@ -66,7 +66,7 @@ class Service extends BaseObject {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
             // Se completan datos en el header
-            body.relation4 = header.relation4.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
+            body.relation5 = header.relation5.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
 
             // Se obtienen los items a crear
             const itemsForCreate = body.items.filter(item => !item.SK);
@@ -189,8 +189,16 @@ class Service extends BaseObject {
             relation2: item.relation2,
             relation3: item.relation3,
             relation4: item.relation4,
+            relation5: item.relation5,
             item: item.item,
+            family: item.family,
+            group: item.group,
+            code: item.code,
+            name: item.name,
+            unity: item.unity,
+            value: item.value,
             quantity: item.quantity,
+            creatorName: this.tokenData.name,
             creationUser: this.tokenData["cognito:username"],
             creationDate: creationDate,
         };
@@ -207,6 +215,7 @@ class Service extends BaseObject {
             relation2: payload.relation2,
             relation3: payload.relation3,
             relation4: payload.relation4,
+            relation5: payload.relation5,
             requireDate: payload.requireDate,
             motive: payload.motive,
             status: Constants.STATUS.PENDING_APPROVAL,

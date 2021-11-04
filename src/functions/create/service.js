@@ -55,8 +55,9 @@ class Service extends BaseObject {
             body.creationDate = creationDate;
             body.relation1 = `${body.project}|${this.tokenData["custom:id"]}|${creationDate}`;
             body.relation2 = `${this.tokenData["custom:id"]}|${creationDate}`;
-            body.relation3 = `${creationDate}`;
-            body.relation4 = `${Constants.STATUS.PENDING_APPROVAL}|${body.project}`;
+            body.relation3 = `${body.project}|${creationDate}`;
+            body.relation4 = `${creationDate}`;
+            body.relation5 = `${Constants.STATUS.PENDING_APPROVAL}|${body.project}`;
 
             const PK = await this.dao.getId(this.table, Constants.ENTITY);
 
@@ -71,6 +72,7 @@ class Service extends BaseObject {
                 body.items[i].relation2 = body.relation2;
                 body.items[i].relation3 = body.relation3;
                 body.items[i].relation4 = body.relation4;
+                body.items[i].relation5 = body.relation5;
                 itemsPromises.push(
                     this.createItemOperation(body.items[i], PK)
                 )
@@ -146,6 +148,7 @@ class Service extends BaseObject {
             relation2: item.relation2,
             relation3: item.relation3,
             relation4: item.relation4,
+            relation5: item.relation5,
             item: item.item,
             family: item.family,
             group: item.group,
@@ -174,6 +177,7 @@ class Service extends BaseObject {
             relation2: payload.relation2,
             relation3: payload.relation3,
             relation4: payload.relation4,
+            relation5: payload.relation5,
             project: payload.project,
             projectName: payload.projectName,
             requireDate: payload.requireDate,

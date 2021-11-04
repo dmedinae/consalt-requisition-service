@@ -52,7 +52,7 @@ class Service extends BaseObject {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
             // Se completan datos en el header
-            body.relation4 = currentRequisition.relation4.replace(currentRequisition.status, body.status);
+            body.relation5 = currentRequisition.relation5.replace(currentRequisition.status, body.status);
 
             // Se construye el encabezado
             transactionOperations.push(this.createRequisitionObject(body))
@@ -76,7 +76,7 @@ class Service extends BaseObject {
     createRequisitionObject(payload) {
         const approveDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
         const item = {
-            relation4: payload.relation4,
+            relation5: payload.relation5,
             reason: payload.reason,
             status: payload.status,
             approveDate: approveDate,

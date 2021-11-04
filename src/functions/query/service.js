@@ -88,8 +88,8 @@ class Service extends BaseObject {
             searchParameters.projectionExpression = entity === Constants.ENTITY ? Constants.REPORT_PROJECTION : Constants.REPORT_ITEMS_PROJECTION;
         }
         if (body.startDate && body.finishDate) {
-            let index = "GSI3";
-            let relation = "relation3";
+            let index = "GSI4";
+            let relation = "relation4";
             let project = "";
             let creationUser = "";
             if (body.creationUser && body.project) {
@@ -102,8 +102,8 @@ class Service extends BaseObject {
                 relation = "relation2";
                 creationUser = `${body.creationUser}|`;
             } else if (body.project) {
-                index = "GSI1";
-                relation = "relation1";
+                index = "GSI3";
+                relation = "relation3";
                 project = `${body.project}|`;
             }
             searchParameters.indexName = index;
