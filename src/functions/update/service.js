@@ -38,6 +38,9 @@ class Service extends BaseObject {
      */
     async update() {
         try {
+            // Se valida permiso a la opción de creación
+            const permission = await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, ["UPDATE"]);
+
             let transactionOperations = [];
             const body = this.event.body;
 
@@ -49,6 +52,10 @@ class Service extends BaseObject {
             const currentRequisition = await this.dao.query(this.table, params);
             if (!currentRequisition.length) {
                 throw this.createResponse("REQI_NO_FOUND", null, {});
+            }
+
+            if (permission === "OWNS" && currentRequisition[0].creationUser !== this.tokenData["cognito:username"]) {
+                throw this.createResponse("UNAUTHORIZE_REQUEST", null, {});
             }
 
             const PK = body.PK;
@@ -74,7 +81,7 @@ class Service extends BaseObject {
                         PKITEM++;
                     }
                 }
-                if (itemsPromises.length && itemsPromises.length >= 10 || i === (body.items.length - 1)) {
+                if (itemsPromises.length && itemsPromises.length >= 5 || i === (body.items.length - 1)) {
                     const resultItems = await Promise.all(itemsPromises).catch(error => {
                         this.createLog("error", "Service error", error);
                         throw this.createResponse("INVALID_REQUEST", null, {});

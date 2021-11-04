@@ -38,6 +38,9 @@ class Service extends BaseObject {
      */
     async save() {
         try {
+            // Se valida permiso a la opción de creación
+            await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, ["CREATE"]);
+
             let transactionOperations = [];
             const body = this.event.body;
             // Se consulta el projecto
@@ -45,6 +48,15 @@ class Service extends BaseObject {
             if (!project) {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
+
+            // Se completan datos en el header
+            const creationDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
+            body.projectName = project.name;
+            body.creationDate = creationDate;
+            body.relation1 = `${creationDate}|${body.project}|${this.tokenData["custom:id"]}|${Constants.STATUS.PENDING_APPROVAL}`;
+            body.relation2 = `${creationDate}|${this.tokenData["custom:id"]}|${Constants.STATUS.PENDING_APPROVAL}`;
+            body.relation3 = `${this.tokenData["custom:id"]}|${body.project}|${Constants.STATUS.PENDING_APPROVAL}`;
+            body.relation4 = `${body.project}|${Constants.STATUS.PENDING_APPROVAL}`;
 
             const PK = await this.dao.getId(this.table, Constants.ENTITY);
 
@@ -54,11 +66,16 @@ class Service extends BaseObject {
             let itemsPromises = [];
             for (let i = 0; i < body.items.length; i++) {
                 body.items[i].SK = `${Constants.ENTITY_ITRQ}${PKITEM}`;
+                body.items[i].creationDate = body.creationDate;
+                body.items[i].relation1 = body.relation1;
+                body.items[i].relation2 = body.relation2;
+                body.items[i].relation3 = body.relation3;
+                body.items[i].relation4 = body.relation4;
                 itemsPromises.push(
                     this.createItemOperation(body.items[i], PK).catch()
                 )
                 PKITEM++;
-                if (itemsPromises.length >= 10 || i === (body.items.length - 1)) {
+                if (itemsPromises.length >= 5 || i === (body.items.length - 1)) {
                     const resultItems = await Promise.all(itemsPromises).catch(error => {
                         this.createLog("error", "Service error", error);
                         throw this.createResponse("INVALID_REQUEST", null, {});
@@ -106,6 +123,12 @@ class Service extends BaseObject {
         if (!itemCoding) {
             throw this.createResponse("INVALID_REQUEST", null, {});
         }
+        item.family = itemCoding.family;
+        item.group = itemCoding.group;
+        item.code = itemCoding.code;
+        item.name = itemCoding.name;
+        item.unity = itemCoding.unityName;
+        item.value = itemCoding.unitValue;
         return { Put: { TableName: this.table, Item: this.createItemObject(PK, item) } };
     }
 
@@ -115,16 +138,25 @@ class Service extends BaseObject {
      * @return {object} Dynamo object with the data to save.
      */
      createItemObject(PK, item) {
-        const creationDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
-
         return {
             PK: PK,
             SK: item.SK,
             entity: Constants.ENTITY_ITRQ,
+            relation1: item.relation1,
+            relation2: item.relation2,
+            relation3: item.relation3,
+            relation4: item.relation4,
             item: item.item,
+            family: item.family,
+            group: item.group,
+            code: item.code,
+            name: item.name,
+            unity: item.unity,
+            value: item.value,
             quantity: item.quantity,
+            creatorName: this.tokenData.name,
             creationUser: this.tokenData["cognito:username"],
-            creationDate: creationDate,
+            creationDate: item.creationDate,
         };
     }
 
@@ -134,19 +166,24 @@ class Service extends BaseObject {
      * @return {object} Dynamo object with the data to save.
      */
      createRequisitionObject(payload, PK) {
-        const creationDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
-
         return {
             PK: PK,
             SK: PK,
             entity: Constants.ENTITY,
+            relation1: body.relation1,
+            relation2: body.relation2,
+            relation3: body.relation3,
+            relation4: body.relation4,
             project: payload.project,
+            projectName: payload.projectName,
             requireDate: payload.requireDate,
             motive: payload.motive,
             observations: payload.observations,
             fileExtension: payload.fileExtension,
+            status: Constants.STATUS.PENDING_APPROVAL,
+            creatorName: this.tokenData.name,
             creationUser: this.tokenData["cognito:username"],
-            creationDate: creationDate,
+            creationDate: payload.creationDate,
         };
     }
 }

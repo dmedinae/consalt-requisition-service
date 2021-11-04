@@ -33,7 +33,8 @@
                         "maxLength": 11
                     },
                     "quantity": {
-                        "type": "number"
+                        "type": "number",
+                        "exclusiveMinimum": 0
                     }
                 },
                 "additionalProperties": false,
