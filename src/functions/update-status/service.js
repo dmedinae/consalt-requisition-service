@@ -41,8 +41,12 @@ class Service extends BaseObject {
             let transactionOperations = [];
             const body = this.event.body;
 
-            const currentRequisition = await this.dao.get(this.table, body.PK, body.PK);
-            if (!currentRequisition) {
+            const params = {
+                indexName: "",
+                parameters: [{ name: "PK", value: body.PK, operator: "=" }],
+            };
+            const currentRequisition = await this.dao.query(this.table, params);
+            if (!currentRequisition[0]) {
                 throw this.createResponse("REQI_NO_FOUND", null, {});
             }
 
@@ -53,6 +57,13 @@ class Service extends BaseObject {
             }
             // Se completan datos en el header
             body.relation5 = currentRequisition.relation5.replace(currentRequisition.status, body.status);
+
+            for (let element of currentRequisition) {
+                if (element.PK !== element.SK) {
+                    element.relation5 = body.relation5;
+                    transactionOperations.push(this.createItemUpdateOperation(element, body.PK));
+                }
+            }
 
             // Se construye el encabezado
             transactionOperations.push(this.createRequisitionObject(body))
@@ -66,6 +77,19 @@ class Service extends BaseObject {
             this.createLog("error", "Service error", error);
             throw this.createResponse("INTERNAL_ERROR", null, error);
         }
+    }
+
+    /**
+     * Function to format the data to save in DDB.
+     * @param {object} payload - Data of the user.
+     * @return {object} Dynamo object with the data to save.
+     */
+     createItemUpdateOperation(item, PK) {
+        const itemUpdate = {
+            relation5: item.relation5
+        };
+        const setAttributes = Object.keys(item);
+        return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
     }
 
     /**

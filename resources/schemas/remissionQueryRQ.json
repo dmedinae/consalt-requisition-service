@@ -16,6 +16,20 @@
         },
         {
             "properties": {
+                "project": {
+                    "type": "string",
+                    "pattern": "^PROJ[0-9]+$",
+                    "maxLength": 11
+                },
+                "status": {
+                    "enum": ["PENDING_APPROVAL","APPROVED","REJECTED","CANCELED"]
+                }
+            },
+            "additionalProperties": false,
+            "required": ["project","status"]
+        },
+        {
+            "properties": {
                 "typeSearch": {
                     "enum": ["S", "R"]
                 },
