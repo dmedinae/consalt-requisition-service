@@ -41,7 +41,7 @@ class Service extends BaseObject {
             // Se valida permiso a la opción de creación
             const permission = await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, ["UPDATE"]);
 
-            let transactionOperations = [];
+            const transactionOperations = [];
             const body = this.event.body;
 
             // Se consulta la requisición actual y sus items

@@ -34,8 +34,8 @@ class Service extends BaseObject {
      */
     async query() {
         try {
-            let searchParameters = this.createSearchParameters();
-            let permission = await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, this.actions);
+            const searchParameters = this.createSearchParameters();
+            const permission = await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, this.actions);
             if (permission === "OWNS") {
                 searchParameters.parameters.push({
                     name: "creationUser",
@@ -44,10 +44,10 @@ class Service extends BaseObject {
                     filterOperator: "=",
                 });
             }
-            let result = await this.dao.query(this.table, searchParameters);
+            const result = await this.dao.query(this.table, searchParameters);
             // Si se consulta por PK y tiene adjunto se agrega
             if (this.event.body.PK) {
-                let header = result.filter(item => item.SK === this.event.body.PK);
+                const header = result.filter(item => item.SK === this.event.body.PK);
                 if (header[0] && header[0].fileExtension) {
                     try {
                         // Parametros para generar la URL firmada
