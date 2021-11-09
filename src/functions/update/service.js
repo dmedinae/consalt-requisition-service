@@ -66,7 +66,9 @@ class Service extends BaseObject {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
             // Se completan datos en el header
-            body.relation5 = header.relation5.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
+            body.relation1 = header.relation1;
+            body.relation2 = header.relation2;
+            body.relation3 = header.relation3.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
 
             // Se obtienen los items a crear
             const itemsForCreate = body.items.filter(item => !item.SK);
@@ -82,7 +84,6 @@ class Service extends BaseObject {
                     body.items[i].relation1 = body.relation1;
                     body.items[i].relation2 = body.relation2;
                     body.items[i].relation3 = body.relation3;
-                    body.items[i].relation4 = body.relation4;
                     if (body.items[i].SK) {
                         transactionOperations.push(this.createItemUpdateOperation(body.items[i], PK))
                     } else {
@@ -147,7 +148,9 @@ class Service extends BaseObject {
      */
     createItemUpdateOperation(item, PK) {
         const itemUpdate = {
-            relation4: item.relation4,
+            relation1: item.relation1,
+            relation2: item.relation2,
+            relation3: item.relation3,
             quantity: item.quantity
         };
         const setAttributes = Object.keys(item);
@@ -188,8 +191,6 @@ class Service extends BaseObject {
             relation1: item.relation1,
             relation2: item.relation2,
             relation3: item.relation3,
-            relation4: item.relation4,
-            relation5: item.relation5,
             item: item.item,
             family: item.family,
             group: item.group,
@@ -214,8 +215,6 @@ class Service extends BaseObject {
             relation1: payload.relation1,
             relation2: payload.relation2,
             relation3: payload.relation3,
-            relation4: payload.relation4,
-            relation5: payload.relation5,
             requireDate: payload.requireDate,
             motive: payload.motive,
             status: Constants.STATUS.PENDING_APPROVAL,

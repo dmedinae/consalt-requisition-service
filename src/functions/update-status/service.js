@@ -45,22 +45,23 @@ class Service extends BaseObject {
                 indexName: "",
                 parameters: [{ name: "PK", value: body.PK, operator: "=" }],
             };
-            const currentRequisition = await this.dao.query(this.table, params);
-            if (!currentRequisition[0]) {
+            const current = await this.dao.query(this.table, params);
+            if (!current.length) {
                 throw this.createResponse("REQI_NO_FOUND", null, {});
             }
 
-            const project = await this.dao.get(this.table, currentRequisition.project, currentRequisition.project);
+            const header = current.filter(element => element.PK === element.SK);
+            const project = await this.dao.get(this.table, header.project, header.project);
 
-            if(currentRequisition !== Constants.STATUS.PENDING_APPROVAL || project.projectManager !== this.tokenData["cognito:username"]) {
+            if(header.status !== Constants.STATUS.PENDING_APPROVAL || project.projectManager !== this.tokenData["custom:id"]) {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
             // Se completan datos en el header
-            body.relation5 = currentRequisition.relation5.replace(currentRequisition.status, body.status);
+            body.relation3 = header.relation3.replace(header.status, body.status);
 
-            for (let element of currentRequisition) {
+            for (let element of current) {
                 if (element.PK !== element.SK) {
-                    element.relation5 = body.relation5;
+                    element.relation3 = body.relation3;
                     transactionOperations.push(this.createItemUpdateOperation(element, body.PK));
                 }
             }
@@ -86,7 +87,7 @@ class Service extends BaseObject {
      */
      createItemUpdateOperation(item, PK) {
         const itemUpdate = {
-            relation5: item.relation5
+            relation3: item.relation3
         };
         const setAttributes = Object.keys(item);
         return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
@@ -100,7 +101,7 @@ class Service extends BaseObject {
     createRequisitionObject(payload) {
         const approveDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
         const item = {
-            relation5: payload.relation5,
+            relation3: payload.relation3,
             reason: payload.reason,
             status: payload.status,
             approveDate: approveDate,

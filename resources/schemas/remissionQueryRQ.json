@@ -33,11 +33,6 @@
                 "typeSearch": {
                     "enum": ["S", "R"]
                 },
-                "creationUser": {
-                    "type": "string",
-                    "pattern": "^PERR[0-9]+$",
-                    "maxLength": 11
-                },
                 "project": {
                     "type": "string",
                     "pattern": "^PROJ[0-9]+$",
@@ -60,11 +55,6 @@
             "properties": {
                 "type": {
                     "enum": ["REQI", "ITRQ"]
-                },
-                "creationUser": {
-                    "type": "string",
-                    "pattern": "^PERR[0-9]+$",
-                    "maxLength": 11
                 },
                 "project": {
                     "type": "string",
