@@ -89,10 +89,11 @@ class Service extends BaseObject {
         }
 
         if (body.project && body.status) {
-            searchParameters.indexName = "GSI5";
+            searchParameters.projectionExpression = Constants.REPORT_PROJECTION;
+            searchParameters.indexName = "GSI3";
             searchParameters.parameters = [
                 { name: "entity", value: Constants.ENTITY, operator: "=" },
-                { name: "relation5", value: `${body.status}|${body.project}`, operator: "=" },
+                { name: "relation3", value: `${body.status}|${body.project}`, operator: "=" },
             ];
         } else if (body.startDate && body.finishDate) {
             let index = "GSI4";
