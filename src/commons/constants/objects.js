@@ -9,7 +9,8 @@ const OBJECTS = Object.freeze({
         APPROVED: "APPROVED",
         REJECTED: "REJECTED",
         CANCELED: "CANCELED",
-        CLOSED: "CLOSED"
+        CLOSED: "CLOSED",
+        PROCCESS: "PROCCESS"
     },
     ALLOWED_UPDATE_STATUS: ["PENDING_APPROVAL", "REJECTED"],
     SEARCH_PROJECTION: "PK,creationDate,project,status,projectName,creatorName",

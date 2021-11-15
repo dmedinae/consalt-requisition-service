@@ -8,18 +8,6 @@
             "pattern": "^REQI[0-9]+$",
             "maxLength": 11
         },
-        "requireDate": {
-            "type": "string"
-        },
-        "motive": {
-            "type": "string"
-        },
-        "observations": {
-            "type": "string"
-        },
-        "fileExtension": {
-            "type": "string"
-        },
         "items": {
             "type": "array",
             "minItems": 1,
@@ -27,26 +15,26 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "SK": {
-                        "type": "string",
-                        "pattern": "^ITRQ[0-9]+$",
-                        "maxLength": 11
-                    },
                     "item": {
                         "type": "string",
                         "pattern": "^ITEM[0-9]+$",
                         "maxLength": 11
                     },
-                    "quantity": {
+                    "request": {
                         "type": "number",
-                        "exclusiveMinimum": 0
+                        "minimum": 0
+
+                    },
+                    "out": {
+                        "type": "number",
+                        "minimum": 0
                     }
                 },
                 "additionalProperties": false,
-                "required": ["item", "quantity"]
+                "required": ["item", "request", "out"]
             }
         }
     },
     "additionalProperties": false,
-    "required": ["PK", "requireDate", "motive", "items"]
+    "required": ["PK", "items"]
 }

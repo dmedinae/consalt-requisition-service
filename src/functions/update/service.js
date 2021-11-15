@@ -59,6 +59,15 @@ class Service extends BaseObject {
                 throw this.createResponse("UNAUTHORIZE_REQUEST", null, {});
             }
 
+            // validate no duplicated items
+            let itemValidation = [];
+            for (let item of body.items) {
+                if (itemValidation.includes(item.item)) {
+                    throw this.createResponse("INVALID_REQUEST", null, {});
+                }
+                itemValidation.push(item.item);
+            }
+
             const PK = body.PK;
 
             // Se obtiene el header

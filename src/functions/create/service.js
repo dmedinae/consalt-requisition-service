@@ -50,6 +50,15 @@ class Service extends BaseObject {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
 
+            // validate no duplicated items
+            let itemValidation = [];
+            for (let item of body.items) {
+                if (itemValidation.includes(item.item)) {
+                    throw this.createResponse("INVALID_REQUEST", null, {});
+                }
+                itemValidation.push(item.item);
+            }
+
             // Se completan datos en el header
             const creationDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
             body.projectName = project.name;
