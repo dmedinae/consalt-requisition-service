@@ -4,7 +4,6 @@ const { BaseDao, BaseObject } = require("@inlaweb/base-node");
 const { Utils } = require("@inlaweb/consalt-utils-node");
 const Constants = require("../../commons/constants/objects");
 const moment = require("moment-timezone");
-const { requests } = require("sinon");
 
 /**
  * Service class.
@@ -190,7 +189,6 @@ class Service extends BaseObject {
 
             header.relation3 = header.relation3.replace(header.status, Constants.STATUS.PROCCESS);
             header.relation4 = header.relation4 ? header.relation3.replace(header.status, Constants.STATUS.PROCCESS) : undefined;
-            header.out = out;
             header.request = request;
 
             for (let item of items) {
@@ -235,7 +233,6 @@ class Service extends BaseObject {
         const item = {
             relation3: payload.relation3,
             relation4: payload.relation4,
-            out: payload.out,
             request: payload.request,
             status: Constants.STATUS.PROCCESS,
             proccessDate: approveDate,
