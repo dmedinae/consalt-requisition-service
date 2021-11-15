@@ -56,7 +56,7 @@ class Service extends BaseObject {
                 parameters: [
                     { name: "PK", value: body.PK, operator: "=" }
                 ],
-                projectionExpression: "PK,SK,item,quantity,relation3,realtion4"
+                projectionExpression: "PK,SK,item,quantity,relation3,realtion4,fileExtension,approverName"
             };
             const requisition = await this.dao.query(this.table, params);
 
@@ -121,6 +121,9 @@ class Service extends BaseObject {
                         requireDate: header.requireDate,
                         motive: header.motive,
                         observations: header.observations,
+                        fileExtension: header.fileExtension,
+                        approverName: header.approverName,
+                        approverUser: header.approverUser,
                         items: itemsRequest
                     }
                 }
@@ -187,6 +190,8 @@ class Service extends BaseObject {
 
             header.relation3 = header.relation3.replace(header.status, Constants.STATUS.PROCCESS);
             header.relation4 = header.relation4 ? header.relation3.replace(header.status, Constants.STATUS.PROCCESS) : undefined;
+            header.out = out;
+            header.request = request;
 
             for (let item of items) {
                 item.relation3 = header.relation3;
@@ -230,6 +235,8 @@ class Service extends BaseObject {
         const item = {
             relation3: payload.relation3,
             relation4: payload.relation4,
+            out: payload.out,
+            request: payload.request,
             status: Constants.STATUS.PROCCESS,
             proccessDate: approveDate,
             proccessName: this.tokenData.name,
