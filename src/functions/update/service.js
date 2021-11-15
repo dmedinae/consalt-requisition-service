@@ -1,6 +1,7 @@
 "use strict";
 
 const { BaseDao, BaseObject } = require("@inlaweb/base-node");
+const { Utils } = require("@inlaweb/consalt-utils-node");
 const Constants = require("../../commons/constants/objects");
 const moment = require("moment-timezone");
 const S3 = require("aws-sdk").S3;
@@ -69,6 +70,7 @@ class Service extends BaseObject {
             body.relation1 = header.relation1;
             body.relation2 = header.relation2;
             body.relation3 = header.relation3.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
+            body.relation4 = header.relation4 ? header.relation3.replace(header.status, Constants.STATUS.PENDING_APPROVAL) : undefined;
 
             // Se obtienen los items a crear
             const itemsForCreate = body.items.filter(item => !item.SK);
@@ -84,6 +86,7 @@ class Service extends BaseObject {
                     body.items[i].relation1 = body.relation1;
                     body.items[i].relation2 = body.relation2;
                     body.items[i].relation3 = body.relation3;
+                    body.items[i].relation4 = body.relation4;
                     if (body.items[i].SK) {
                         transactionOperations.push(this.createItemUpdateOperation(body.items[i], PK))
                     } else {
@@ -133,6 +136,8 @@ class Service extends BaseObject {
                 url = await this.s3.getSignedUrlPromise("putObject", params);
             }
 
+            await Utils.updateProjectBudget(Constants.ENTITY, body, header.status === Constants.STATUS.PENDING_APPROVAL ? currentRequisition : undefined);
+
             // Se retorna el id insertado
             return { PK, url };
         } catch (error) {
@@ -151,6 +156,7 @@ class Service extends BaseObject {
             relation1: item.relation1,
             relation2: item.relation2,
             relation3: item.relation3,
+            relation4: item.relation4,
             quantity: item.quantity
         };
         const setAttributes = Object.keys(item);
@@ -191,6 +197,7 @@ class Service extends BaseObject {
             relation1: item.relation1,
             relation2: item.relation2,
             relation3: item.relation3,
+            relation4: item.relation4,
             item: item.item,
             family: item.family,
             group: item.group,
@@ -215,6 +222,7 @@ class Service extends BaseObject {
             relation1: payload.relation1,
             relation2: payload.relation2,
             relation3: payload.relation3,
+            relation4: payload.relation4,
             requireDate: payload.requireDate,
             motive: payload.motive,
             status: Constants.STATUS.PENDING_APPROVAL,

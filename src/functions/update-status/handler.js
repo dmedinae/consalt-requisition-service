@@ -1,7 +1,7 @@
 "use strict";
 
 const Service = require("./service");
-const SCHEMA = require("../../../resources/schemas/requisitionUpdateRQ.json");
+const SCHEMA = require("../../../resources/schemas/updateRQ.json");
 const service = new Service();
 
 global.ErrorResponses = require("../../commons/constants/errorResponses");

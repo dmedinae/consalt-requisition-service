@@ -27,7 +27,8 @@
         "sinon-chai": "^3.5.0"
     },
     "dependencies": {
-        "@inlaweb/base-node": "^1.0.3",
+        "@inlaweb/base-node": "^1.0.0",
+        "@inlaweb/consalt-utils-node": "^1.0.0",
         "ajv": "^7.2.3",
         "aws-sdk": "^2.623.0",
         "jsonwebtoken": "^8.5.1",

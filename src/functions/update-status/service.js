@@ -1,6 +1,7 @@
 "use strict";
 
 const { BaseDao, BaseObject } = require("@inlaweb/base-node");
+const { Utils } = require("@inlaweb/consalt-utils-node");
 const Constants = require("../../commons/constants/objects");
 const moment = require("moment-timezone");
 
@@ -44,6 +45,7 @@ class Service extends BaseObject {
             const params = {
                 indexName: "",
                 parameters: [{ name: "PK", value: body.PK, operator: "=" }],
+                projectionExpression: "PK,SK,project,relation3,relation4"
             };
             const current = await this.dao.query(this.table, params);
             if (!current.length) {
@@ -51,17 +53,19 @@ class Service extends BaseObject {
             }
 
             const header = current.filter(element => element.PK === element.SK);
-            const project = await this.dao.get(this.table, header.project, header.project);
+            const project = await this.dao.get(this.table, header.project, header.project, "projectManager");
 
             if(header.status !== Constants.STATUS.PENDING_APPROVAL || project.projectManager !== this.tokenData["custom:id"]) {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
             // Se completan datos en el header
             body.relation3 = header.relation3.replace(header.status, body.status);
+            body.relation4 = header.relation4 ? header.relation3.replace(header.status, body.status) : undefined;
 
             for (let element of current) {
                 if (element.PK !== element.SK) {
                     element.relation3 = body.relation3;
+                    element.relation4 = body.relation4;
                     transactionOperations.push(this.createItemUpdateOperation(element, body.PK));
                 }
             }
@@ -71,6 +75,10 @@ class Service extends BaseObject {
 
             await this.dao.writeTransactions(transactionOperations, 24);
             await this.dao.audit(Constants.ENTITY, PK, "APPROVE");
+
+            if (body.status !== Constants.STATUS.APPROVED) {
+                await Utils.updateProjectBudget(Constants.ENTITY, undefined, current);
+            }
 
             // Se retorna el id insertado
             return { PK };
@@ -87,7 +95,8 @@ class Service extends BaseObject {
      */
      createItemUpdateOperation(item, PK) {
         const itemUpdate = {
-            relation3: item.relation3
+            relation3: item.relation3,
+            relation4: item.relation4
         };
         const setAttributes = Object.keys(item);
         return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
@@ -102,6 +111,7 @@ class Service extends BaseObject {
         const approveDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
         const item = {
             relation3: payload.relation3,
+            relation4: payload.relation4,
             reason: payload.reason,
             status: payload.status,
             approveDate: approveDate,

@@ -1,6 +1,7 @@
 "use strict";
 
 const { BaseDao, BaseObject } = require("@inlaweb/base-node");
+const { Utils } = require("@inlaweb/consalt-utils-node");
 const Constants = require("../../commons/constants/objects");
 const moment = require("moment-timezone");
 const S3 = require("aws-sdk").S3;
@@ -44,7 +45,7 @@ class Service extends BaseObject {
             const transactionOperations = [];
             const body = this.event.body;
             // Se consulta el projecto
-            const project = await this.dao.get(this.table, body.project, body.project);
+            const project = await this.dao.get(this.table, body.project, body.project, "name,frameProject");
             if (!project) {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
@@ -56,6 +57,7 @@ class Service extends BaseObject {
             body.relation1 = `${body.project}|${creationDate}`;
             body.relation2 = `${creationDate}`;
             body.relation3 = `${Constants.STATUS.PENDING_APPROVAL}|${body.project}`;
+            body.relation4 = project.frameProject ? `${Constants.STATUS.PENDING_APPROVAL}|${project.frameProject}` : undefined;
 
             const PK = await this.dao.getId(this.table, Constants.ENTITY);
 
@@ -69,6 +71,7 @@ class Service extends BaseObject {
                 body.items[i].relation1 = body.relation1;
                 body.items[i].relation2 = body.relation2;
                 body.items[i].relation3 = body.relation3;
+                body.items[i].relation4 = body.relation4;
                 itemsPromises.push(
                     this.createItemOperation(body.items[i], PK)
                 )
@@ -101,6 +104,8 @@ class Service extends BaseObject {
                 };
                 url = await this.s3.getSignedUrlPromise("putObject", params);
             }
+
+            await Utils.updateProjectBudget(Constants.ENTITY, body);
 
             // Se retorna el id insertado
             return { PK, url };
@@ -143,6 +148,7 @@ class Service extends BaseObject {
             relation1: item.relation1,
             relation2: item.relation2,
             relation3: item.relation3,
+            relation4: item.relation4,
             item: item.item,
             family: item.family,
             group: item.group,
@@ -170,6 +176,7 @@ class Service extends BaseObject {
             relation1: payload.relation1,
             relation2: payload.relation2,
             relation3: payload.relation3,
+            relation4: payload.relation4,
             project: payload.project,
             projectName: payload.projectName,
             requireDate: payload.requireDate,
