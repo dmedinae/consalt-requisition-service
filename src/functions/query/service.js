@@ -44,7 +44,7 @@ class Service extends BaseObject {
                     filterOperator: "=",
                 });
             }
-            const result;
+            let result;
             const data = await this.dao.query(this.table, searchParameters);
 
             if ((this.tokenData.profile == "PROF4" || this.tokenData.profile == "PROF5" || this.tokenData.profile == "PROF6" || this.tokenData.profile == "PROF7") && !this.event.project){
