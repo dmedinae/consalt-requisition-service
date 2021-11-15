@@ -134,6 +134,17 @@ functions:
             id:
               "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
 
+  query-proccess:
+    handler:  src/functions/query-proccess/handler.queryProccess
+    description: Microservice for get the ready to process requisition with inventory quantities
+    events:
+      - httpApi:
+          path: /v1/requisition/query-proccess
+          method: post
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
 resources:
   Description: functions stack for the requisition service
 

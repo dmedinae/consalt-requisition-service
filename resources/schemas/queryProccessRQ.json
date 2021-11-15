@@ -1,0 +1,16 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "remissionQueryRQ",
+    "type": "object",
+    "properties": {
+        "PK": {
+            "type": "string",
+            "pattern": "^REQI[0-9]+$",
+            "maxLength": 11
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "PK"
+    ]
+}

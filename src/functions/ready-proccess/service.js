@@ -35,6 +35,10 @@ class Service extends BaseObject {
     async readyProccess() {
         try {
             const response = [];
+
+            // Se valida permiso
+            await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, ["PROCCESS"]);
+
             // Query for frames where user is storer
             let params = {
                 indexName: "GSI6",
