@@ -72,10 +72,11 @@ class Service extends BaseObject {
 
             let PKITEM = await this.dao.getId(this.table, Constants.ENTITY_ITRQ, body.items.length);
 
-            // Se validan los items y se crean las operaciones en lotes de 10
+            // Se validan los items y se crean las operaciones en lotes
             let itemsPromises = [];
             for (let i = 0; i < body.items.length; i++) {
                 body.items[i].SK = `${Constants.ENTITY_ITRQ}${PKITEM}`;
+                body.items[i].project = body.project;
                 body.items[i].creationDate = body.creationDate;
                 body.items[i].relation1 = body.relation1;
                 body.items[i].relation2 = body.relation2;
@@ -159,6 +160,7 @@ class Service extends BaseObject {
             relation3: item.relation3,
             relation4: item.relation4,
             item: item.item,
+            item: item.project,
             family: item.family,
             group: item.group,
             code: item.code,

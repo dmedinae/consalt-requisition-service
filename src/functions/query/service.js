@@ -44,7 +44,25 @@ class Service extends BaseObject {
                     filterOperator: "=",
                 });
             }
-            const result = await this.dao.query(this.table, searchParameters);
+            const result;
+            const data = await this.dao.query(this.table, searchParameters);
+
+            if ((this.tokenData.profile == "PROF4" || this.tokenData.profile == "PROF5" || this.tokenData.profile == "PROF6" || this.tokenData.profile == "PROF7") && !this.event.project){
+                let params = {
+                    indexName: "GSI4",
+                    parameters: [
+                        { name: "entity", value: Constants.ENTITY_PROJ, operator: "=" },
+                        { name: "relation4", value: `${this.tokenData["custom:id"]}|`, operator: "begins_with" }
+                    ],
+                    projectionExpression: "PK"
+                };
+                const projectsQuery = await this.dao.query(this.table, params);
+                const projects = projectsQuery.map(element => element.PK);
+                result = data.filter(item => projects.includes(item.project));
+            }else{
+                result = data;
+            }
+
             // Si se consulta por PK y tiene adjunto se agrega
             if (this.event.body.PK) {
                 const header = result.filter(item => item.SK === this.event.body.PK);
@@ -89,53 +107,37 @@ class Service extends BaseObject {
         }
 
         if (body.project && body.status) {
-            searchParameters.projectionExpression = Constants.REPORT_PROJECTION;
             searchParameters.indexName = "GSI3";
             searchParameters.parameters = [
                 { name: "entity", value: Constants.ENTITY, operator: "=" },
                 { name: "relation3", value: `${body.status}|${body.project}`, operator: "=" },
+            ];
+        } else if (body.status) {
+            searchParameters.indexName = "GSI3";
+            searchParameters.parameters = [
+                { name: "entity", value: Constants.ENTITY, operator: "=" },
+                { name: "relation3", value: `${body.status}|`, operator: "begins_with" },
+            ];
+        } else if (body.project) {
+            searchParameters.indexName = "GSI1";
+            searchParameters.parameters = [
+                { name: "entity", value: Constants.ENTITY, operator: "=" },
+                { name: "relation1", value: `${body.project}|`, operator: "begins_with" },
             ];
         } else if (body.startDate && body.finishDate) {
             let index = "GSI4";
             let relation = "relation4";
             let project = "";
             let creationUser = "";
-            if (body.creationUser && body.project) {
+            if (body.project) {
                 index = "GSI1";
                 relation = "relation1";
-                creationUser = `${body.creationUser}|`;
-                project = `${body.project}|`;
-            } else if (body.creationUser) {
-                index = "GSI2";
-                relation = "relation2";
-                creationUser = `${body.creationUser}|`;
-            } else if (body.project) {
-                index = "GSI3";
-                relation = "relation3";
                 project = `${body.project}|`;
             }
             searchParameters.indexName = index;
             searchParameters.parameters = [
                 { name: "entity", value: entity, operator: "=" },
                 { name: relation, value: `${project}${creationUser}${startDate}`, value1: `${project}${creationUser}${finishDate}`, operator: "BETWEEN" },
-            ];
-        } else if (body.project || body.creationUser) {
-            let index = "GSI1";
-            let relation = "relation1";
-            let value = "";
-            if (body.creationUser && body.project) {
-                value = `${body.project}|${body.creationUser}|`;
-            } else if (body.creationUser) {
-                index = "GSI2";
-                relation = "relation2";
-                value = `${body.creationUser}|`;
-            } else if (body.project) {
-                value = `${body.project}|`;
-            }
-            searchParameters.indexName = index;
-            searchParameters.parameters = [
-                { name: "entity", value: entity, operator: "=" },
-                { name: relation, value: value, operator: "begins_with" },
             ];
         } else if (this.event.body.PK) {
             searchParameters.projectionExpression = Constants.PK_PROJECTION;

@@ -25,8 +25,8 @@
                     "enum": ["PENDING_APPROVAL","APPROVED","REJECTED","CANCELED"]
                 }
             },
-            "additionalProperties": false,
-            "required": ["project","status"]
+            "minProperties": 1,
+            "additionalProperties": false
         },
         {
             "properties": {

@@ -14,8 +14,8 @@ const OBJECTS = Object.freeze({
     },
     ALLOWED_UPDATE_STATUS: ["PENDING_APPROVAL", "REJECTED"],
     SEARCH_PROJECTION: "PK,creationDate,project,status,projectName,creatorName",
-    REPORT_PROJECTION: "PK,projectName,creatorName,creationDate,requireDate,approveDate,motive,requests,outs,status",
-    REPORT_ITEMS_PROJECTION: "PK,creatorName,code,name,quantity",
+    REPORT_PROJECTION: "PK,project,projectName,creatorName,creationDate,requireDate,approveDate,motive,requests,outs,status",
+    REPORT_ITEMS_PROJECTION: "PK,project,creatorName,code,name,quantity",
     PK_PROJECTION: "PK,SK,creationUser,creatorName,approveDate,approverName,project,projectName,creationDate,requireDate,motive,observations,fileExtension,status,item,code,name,unity,quantity"
 });
 

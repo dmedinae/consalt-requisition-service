@@ -79,7 +79,7 @@ class Service extends BaseObject {
             body.relation1 = header.relation1;
             body.relation2 = header.relation2;
             body.relation3 = header.relation3.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
-            body.relation4 = header.relation4 ? header.relation3.replace(header.status, Constants.STATUS.PENDING_APPROVAL) : undefined;
+            body.relation4 = header.relation4 ? header.relation4.replace(header.status, Constants.STATUS.PENDING_APPROVAL) : undefined;
 
             // Se obtienen los items a crear
             const itemsForCreate = body.items.filter(item => !item.SK);
@@ -92,6 +92,7 @@ class Service extends BaseObject {
             for (let i = 0; i < body.items.length; i++) {
                 if (!body.items[i].SK || !processItems[body.items[i].SK]) {
                     processItems[body.items[i].SK] = 1;
+                    body.items[i].project = body.project;
                     body.items[i].relation1 = body.relation1;
                     body.items[i].relation2 = body.relation2;
                     body.items[i].relation3 = body.relation3;
@@ -208,6 +209,7 @@ class Service extends BaseObject {
             relation3: item.relation3,
             relation4: item.relation4,
             item: item.item,
+            item: item.project,
             family: item.family,
             group: item.group,
             code: item.code,

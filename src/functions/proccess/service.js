@@ -156,7 +156,7 @@ class Service extends BaseObject {
                     if (!currentItemBag) {
                         putItemsBag.push({
                             PK: bagPK,
-                            SK: itemsBag.item,
+                            SK: itemBag.item,
                             quantity: 0
                         });
                     }
