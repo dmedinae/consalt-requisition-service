@@ -2,12 +2,9 @@ service: consalt-requisition-service
 
 plugins:
   - serverless-prune-plugin
-  - serverless-plugin-optimize
   - serverless-plugin-log-retention
   - serverless-plugin-resource-tagging
 
-package:
-  individually: true
 
 provider:
   name: aws
@@ -170,8 +167,6 @@ resources:
 
 custom:
     logRetentionInDays: 14
-    optimize:
-      global: true
 
     prune:
       automatic: true

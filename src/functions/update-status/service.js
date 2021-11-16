@@ -34,7 +34,7 @@ class Service extends BaseObject {
      * Function to save a item.
      * @return {object} The object with the respective PK.
      */
-    async update() {
+    async updateStatus() {
         try {
             // Se valida permiso a la opción de creación
             await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, ["APPROVE"]);
@@ -45,14 +45,14 @@ class Service extends BaseObject {
             const params = {
                 indexName: "",
                 parameters: [{ name: "PK", value: body.PK, operator: "=" }],
-                projectionExpression: "PK,SK,project,relation3,relation4"
+                projectionExpression: "PK,SK,project,status,relation3,relation4,family,group,value,quantity"
             };
             const current = await this.dao.query(this.table, params);
             if (!current.length) {
                 throw this.createResponse("REQI_NO_FOUND", null, {});
             }
 
-            const header = current.filter(element => element.PK === element.SK);
+            const header = current.find(element => element.PK === element.SK);
             const project = await this.dao.get(this.table, header.project, header.project, "projectManager");
 
             if(header.status !== Constants.STATUS.PENDING_APPROVAL || project.projectManager !== this.tokenData["custom:id"]) {
@@ -74,15 +74,16 @@ class Service extends BaseObject {
             transactionOperations.push(this.createRequisitionObject(body))
 
             await this.dao.writeTransactions(transactionOperations, 24);
-            await this.dao.audit(Constants.ENTITY, PK, "APPROVE");
+            await this.dao.audit(Constants.ENTITY, body.PK, "APPROVE");
 
             if (body.status !== Constants.STATUS.APPROVED) {
                 await Utils.updateProjectBudget(Constants.ENTITY, undefined, current);
             }
 
             // Se retorna el id insertado
-            return { PK };
+            return { PK: body.PK };
         } catch (error) {
+            console.log(error);
             this.createLog("error", "Service error", error);
             throw this.createResponse("INTERNAL_ERROR", null, error);
         }

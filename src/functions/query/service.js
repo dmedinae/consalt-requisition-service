@@ -125,8 +125,8 @@ class Service extends BaseObject {
                 { name: "relation1", value: `${body.project}|`, operator: "begins_with" },
             ];
         } else if (body.startDate && body.finishDate) {
-            let index = "GSI4";
-            let relation = "relation4";
+            let index = "GSI2";
+            let relation = "relation2";
             let project = "";
             let creationUser = "";
             if (body.project) {

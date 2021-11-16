@@ -76,6 +76,8 @@ class Service extends BaseObject {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
             // Se completan datos en el header
+            const requireDate = moment(new Date(body.requireDate)).format("YYYY-MM-DD");
+            body.requireDate = requireDate;
             body.relation1 = header.relation1;
             body.relation2 = header.relation2;
             body.relation3 = header.relation3.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
@@ -146,11 +148,12 @@ class Service extends BaseObject {
                 url = await this.s3.getSignedUrlPromise("putObject", params);
             }
 
-            await Utils.updateProjectBudget(Constants.ENTITY, body, header.status === Constants.STATUS.PENDING_APPROVAL ? currentRequisition : undefined);
+            await Utils.updateProjectBudget(Constants.ENTITY, body, currentRequisition, header.status === Constants.STATUS.REJECTED);
 
             // Se retorna el id insertado
             return { PK, url };
         } catch (error) {
+            console.log(error);
             this.createLog("error", "Service error", error);
             throw this.createResponse("INTERNAL_ERROR", null, error);
         }
@@ -209,7 +212,7 @@ class Service extends BaseObject {
             relation3: item.relation3,
             relation4: item.relation4,
             item: item.item,
-            item: item.project,
+            project: item.project,
             family: item.family,
             group: item.group,
             code: item.code,

@@ -61,6 +61,8 @@ class Service extends BaseObject {
 
             // Se completan datos en el header
             const creationDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
+            const requireDate = moment(new Date(body.requireDate)).format("YYYY-MM-DD");
+            body.requireDate = requireDate;
             body.projectName = project.name;
             body.creationDate = creationDate;
             body.relation1 = `${body.project}|${creationDate}`;
@@ -160,7 +162,7 @@ class Service extends BaseObject {
             relation3: item.relation3,
             relation4: item.relation4,
             item: item.item,
-            item: item.project,
+            project: item.project,
             family: item.family,
             group: item.group,
             code: item.code,
