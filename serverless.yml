@@ -113,6 +113,17 @@ functions:
             id:
               "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
 
+  ready-approve:
+    handler:  src/functions/ready-approve/handler.readyApprove
+    description: Microservice for get the ready to approve requisitions for the auth user
+    events:
+      - httpApi:
+          path: /v1/requisition/ready-approve
+          method: get
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
   update-status:
     handler:  src/functions/update-status/handler.updateStatus
     description: Microservice for update the requisition status

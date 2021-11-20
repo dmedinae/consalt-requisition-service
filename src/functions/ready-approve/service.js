@@ -32,57 +32,34 @@ class Service extends BaseObject {
      * Function to save a item.
      * @return {object} The object with the respective PK.
      */
-    async readyProccess() {
+    async readyApprove() {
         try {
             const response = [];
 
             // Se valida permiso
-            await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, ["PROCCESS"]);
+            await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, ["APPROVE"]);
 
-            // Query for frames where user is storer
-            let params = {
-                indexName: "GSI6",
-                parameters: [
-                    { name: "entity", value: "FRAM", operator: "=" },
-                    { name: "relation6", value: this.tokenData["custom:id"], operator: "begins_with" }
-                ],
-                projectionExpression: "PK"
-            };
-            const framesWhereUserIsStorer = await this.dao.query(this.table, params);
-            // Query for projects where user is storer
+            // Query for projects where user is manager
             params = {
-                indexName: "GSI6",
+                indexName: "GSI4",
                 parameters: [
                     { name: "entity", value: "PROJ", operator: "=" },
                     { name: "relation6", value: this.tokenData["custom:id"], operator: "begins_with" }
                 ],
                 projectionExpression: "PK"
             };
-            const projectsWhereUserIsStorer = await this.dao.query(this.table, params);
+            const projectsWhereUserIsManager = await this.dao.query(this.table, params);
 
-            if (!framesWhereUserIsStorer.length && !projectsWhereUserIsStorer.length ) {
+            if (!projectsWhereUserIsManager.length ) {
                 return [];
             }
 
-            for (let frame of framesWhereUserIsStorer) {
-                params = {
-                    indexName: "GSI4",
-                    parameters: [
-                        { name: "entity", value: Constants.ENTITY, operator: "=" },
-                        { name: "relation4", value: `${Constants.STATUS.APPROVED}|${frame.PK}`, operator: "=" }
-                    ],
-                    projectionExpression: "PK,creationDate,project,status,projectName,creatorName"
-                };
-                const result = await this.dao.query(this.table, params);
-                response.push(...result);
-            }
-
-            for (let project of projectsWhereUserIsStorer) {
+            for (let project of projectsWhereUserIsManager) {
                 params = {
                     indexName: "GSI3",
                     parameters: [
                         { name: "entity", value: Constants.ENTITY, operator: "=" },
-                        { name: "relation3", value: `${Constants.STATUS.APPROVED}|${project.PK}`, operator: "=" }
+                        { name: "relation3", value: `${Constants.STATUS.PENDING_APPROVAL}|${project.PK}`, operator: "=" }
                     ],
                     projectionExpression: "PK,creationDate,project,status,projectName,creatorName"
                 };
