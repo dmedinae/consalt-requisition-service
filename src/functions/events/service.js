@@ -2,7 +2,6 @@
 
 const Constants = require("../../commons/constants/objects");
 const { BaseDao, BaseObject } = require("@inlaweb/base-node");
-const moment = require("moment-timezone");
 
 /**
  * Service class.
