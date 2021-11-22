@@ -40,7 +40,7 @@ class Service extends BaseObject {
             await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, ["APPROVE"]);
 
             // Query for projects where user is manager
-            params = {
+            let params = {
                 indexName: "GSI4",
                 parameters: [
                     { name: "entity", value: "PROJ", operator: "=" },
