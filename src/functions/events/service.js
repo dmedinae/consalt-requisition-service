@@ -57,8 +57,8 @@ class Service extends BaseObject {
                 if (currentItem.associateQuantity === currentItem.quantity) {
                     currentItem.relation3 = currentItem.relation3.replace(header.status, Constants.STATUS.CLOSED);
                     currentItem.relation4 = currentItem.relation4 ? currentItem.relation4.replace(header.status, Constants.STATUS.CLOSED) : undefined;
-                    transactionOperations.push(this.createItemUpdateOperation(currentItem, header.PK));
                 }
+                transactionOperations.push(this.createItemUpdateOperation(currentItem, header.PK));
             }
 
             const openItems = items.filter(item => item.relation3 !== `${Constants.STATUS.CLOSED}|${header.project}`);
