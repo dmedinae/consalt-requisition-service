@@ -31,7 +31,7 @@ class Service extends BaseObject {
      * Function to save a item.
      * @return {object} The object with the respective PK.
      */
-    async projectBudget() {
+    async associate() {
         try {
             const transactionOperations = [];
             // Se consulta la requisición actual y sus items

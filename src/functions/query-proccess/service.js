@@ -52,7 +52,7 @@ class Service extends BaseObject {
                 throw this.createResponse("REQI_NO_FOUND", null, {});
             }
 
-            const header = requisition.filter(elem => elem.PK === elem.SK);
+            const header = requisition.find(elem => elem.PK === elem.SK);
 
             const project = await this.dao.get(this.table, header.project, header.project, "storer,frameProject");
             const frame = project.frameProject ? await this.dao.get(this.table, project.frameProject, project.frameProject, "storer") : undefined;
