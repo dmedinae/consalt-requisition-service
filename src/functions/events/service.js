@@ -64,8 +64,8 @@ class Service extends BaseObject {
             const openItems = items.filter(item => item.relation3 !== `${Constants.STATUS.CLOSED}|${header.project}`);
 
             if (!openItems.length) {
-                header.relation3 = header.relation3.replace(header.status, Constants.STATUS.CLOSED);
-                header.relation4 = header.relation4 ? header.relation4.replace(header.status, Constants.STATUS.CLOSED) : undefined;
+                header.relation3 = header.relation3.replace(Constants.STATUS.PROCCESS, Constants.STATUS.CLOSED);
+                header.relation4 = header.relation4 ? header.relation4.replace(Constants.STATUS.PROCCESS, Constants.STATUS.CLOSED) : undefined;
                 header.status = Constants.STATUS.CLOSED;
             }
 

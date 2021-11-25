@@ -28,6 +28,7 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
           Resource:
             - 'Fn::ImportValue': consalt-${self:provider.stage}-DBARN
             - 'Fn::ImportValue': consalt-audit-${self:provider.stage}-DBARN
