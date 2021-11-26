@@ -128,6 +128,8 @@ class Service extends BaseObject {
                 }
                 const response = await Utils.invokeLambda(process.env.LAMBDA_REQUEST_CREATE, payload);
                 this.createLog("info", "Response OUT", response);
+                const responsePayload = JSON.parse(response.Payload);
+                out = responsePayload && responsePayload.body ? responsePayload.body.PK : undefined;
             }
 
             let request;
@@ -146,6 +148,8 @@ class Service extends BaseObject {
                 }
                 const response = await Utils.invokeLambda(process.env.LAMBDA_OUT_CREATE, payload);
                 this.createLog("info", "Response REQUEST", response);
+                const responsePayload = JSON.parse(response.Payload);
+                request = responsePayload && responsePayload.body ? responsePayload.body.PK : undefined;
             }
 
             if (itemsBag.length) {
@@ -190,6 +194,7 @@ class Service extends BaseObject {
             header.relation3 = header.relation3.replace(Constants.STATUS.APPROVED, Constants.STATUS.PROCCESS);
             header.relation4 = header.relation4 ? header.relation3.replace(Constants.STATUS.APPROVED, Constants.STATUS.PROCCESS) : undefined;
             header.request = request;
+            header.out = out;
 
             for (let item of items) {
                 item.relation3 = header.relation3;
@@ -234,6 +239,7 @@ class Service extends BaseObject {
             relation3: payload.relation3,
             relation4: payload.relation4,
             request: payload.request,
+            out: payload.out,
             status: Constants.STATUS.PROCCESS,
             proccessDate: approveDate,
             proccessName: this.tokenData.name,
