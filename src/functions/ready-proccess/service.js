@@ -49,18 +49,8 @@ class Service extends BaseObject {
                 projectionExpression: "PK"
             };
             const framesWhereUserIsStorer = await this.dao.query(this.table, params);
-            // Query for projects where user is storer
-            params = {
-                indexName: "GSI6",
-                parameters: [
-                    { name: "entity", value: "PROJ", operator: "=" },
-                    { name: "relation6", value: this.tokenData["custom:id"], operator: "begins_with" }
-                ],
-                projectionExpression: "PK"
-            };
-            const projectsWhereUserIsStorer = await this.dao.query(this.table, params);
 
-            if (!framesWhereUserIsStorer.length && !projectsWhereUserIsStorer.length ) {
+            if (!framesWhereUserIsStorer.length) {
                 return [];
             }
 
@@ -70,19 +60,6 @@ class Service extends BaseObject {
                     parameters: [
                         { name: "entity", value: Constants.ENTITY, operator: "=" },
                         { name: "relation4", value: `${Constants.STATUS.APPROVED}|${frame.PK}`, operator: "=" }
-                    ],
-                    projectionExpression: "PK,creationDate,project,status,projectName,creatorName"
-                };
-                const result = await this.dao.query(this.table, params);
-                response.push(...result);
-            }
-
-            for (let project of projectsWhereUserIsStorer) {
-                params = {
-                    indexName: "GSI3",
-                    parameters: [
-                        { name: "entity", value: Constants.ENTITY, operator: "=" },
-                        { name: "relation3", value: `${Constants.STATUS.APPROVED}|${project.PK}`, operator: "=" }
                     ],
                     projectionExpression: "PK,creationDate,project,status,projectName,creatorName"
                 };

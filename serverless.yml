@@ -2,9 +2,12 @@ service: consalt-requisition-service
 
 plugins:
   - serverless-prune-plugin
+  - serverless-plugin-optimize
   - serverless-plugin-log-retention
   - serverless-plugin-resource-tagging
 
+package:
+  individually: true
 
 provider:
   name: aws
@@ -47,9 +50,14 @@ provider:
           Action:
             - lambda:InvokeFunction
           Resource:
-            - 'Fn::Sub': "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:consalt-project-service-${self:provider.stage}-events"
             - 'Fn::Sub': "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:consalt-request-service-${self:provider.stage}-create"
             - 'Fn::Sub': "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:consalt-out-service-${self:provider.stage}-create"
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+          Resource:
+            - 'Fn::Sub': "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:consalt-${self:provider.stage}-budget"
+            - 'Fn::Sub': "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:consalt-${self:provider.stage}-email"
   deploymentBucket:
     name: ${self:provider.stage}-serverless-stacks
   httpApi:
@@ -72,10 +80,13 @@ provider:
       'Fn::ImportValue': consalt-${self:provider.stage}-Pool-ID
     APP_ID:
       'Fn::ImportValue': consalt-${self:provider.stage}-APP-ID
-    LAMBDA_PROJECT_BUDGET: consalt-project-service-${self:provider.stage}-events
     LAMBDA_REQUEST_CREATE: consalt-request-service-${self:provider.stage}-create
     LAMBDA_OUT_CREATE: consalt-out-service-${self:provider.stage}-create
     BUCKET_NAME: ${self:provider.stage}-consalt-files
+    SQS_MAIL:
+      'Fn::Sub': "https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/consalt-${self:provider.stage}-email"
+    SQS_PROJECT_BUDGET:
+      'Fn::Sub': "https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/consalt-${self:provider.stage}-budget"
     LOG_LEVEL: debug
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
 
@@ -179,6 +190,8 @@ resources:
 
 custom:
     logRetentionInDays: 14
+    optimize:
+      global: true
 
     prune:
       automatic: true

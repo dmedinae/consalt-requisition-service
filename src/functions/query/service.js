@@ -2,6 +2,7 @@
 
 const { BaseDao, BaseObject } = require("@inlaweb/base-node");
 const Constants = require("../../commons/constants/objects");
+const { Utils } = require("@inlaweb/consalt-utils-node");
 const moment = require("moment-timezone");
 const S3 = require("aws-sdk").S3;
 
@@ -68,14 +69,7 @@ class Service extends BaseObject {
                 const header = result.filter(item => item.SK === this.event.body.PK);
                 if (header[0] && header[0].fileExtension) {
                     try {
-                        // Parametros para generar la URL firmada
-                        const params = {
-                            Bucket: this.bucketName,
-                            Key: `${Constants.ENTITY}/${this.event.body.PK}_${this.event.body.PK}.${header[0].fileExtension}`,
-                            Expires: 43200,
-                        };
-                        const url = await this.s3.getSignedUrlPromise("getObject", params);
-                        header[0].urlAtt = url;
+                        header[0].urlAtt = await Utils.getFileSignedUrlGet(`${Constants.ENTITY}/${this.event.body.PK}_${this.event.body.PK}.${header[0].fileExtension}`);
                     } catch (error) {
                         this.createLog("error", "Service error getting de url file", error);
                     }

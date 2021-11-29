@@ -44,7 +44,7 @@ class Service extends BaseObject {
                 indexName: "GSI4",
                 parameters: [
                     { name: "entity", value: "PROJ", operator: "=" },
-                    { name: "relation4", value: this.tokenData["custom:id"], operator: "begins_with" }
+                    { name: "relation4", value: `${this.tokenData["custom:id"]}|`, operator: "begins_with" }
                 ],
                 projectionExpression: "PK"
             };

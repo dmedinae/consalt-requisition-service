@@ -4,7 +4,6 @@ const { BaseDao, BaseObject } = require("@inlaweb/base-node");
 const { Utils } = require("@inlaweb/consalt-utils-node");
 const Constants = require("../../commons/constants/objects");
 const moment = require("moment-timezone");
-const S3 = require("aws-sdk").S3;
 
 /**
  * Service class.
@@ -16,11 +15,9 @@ class Service extends BaseObject {
      */
     constructor() {
         super();
-        this.s3 = new S3();
         this.dao = new BaseDao();
         this.table = process.env.TABLE_NAME;
         this.permissionTable = process.env.TABLE_PERMISSIONS_NAME;
-        this.bucketName = process.env.BUCKET_NAME;
     }
 
     /**
@@ -81,7 +78,7 @@ class Service extends BaseObject {
             body.relation1 = header.relation1;
             body.relation2 = header.relation2;
             body.relation3 = header.relation3.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
-            body.relation4 = header.relation4 ? header.relation4.replace(header.status, Constants.STATUS.PENDING_APPROVAL) : undefined;
+            body.relation4 = header.relation4.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
 
             // Se obtienen los items a crear
             const itemsForCreate = body.items.filter(item => !item.SK);
@@ -138,14 +135,7 @@ class Service extends BaseObject {
             let url;
 
             if (this.event.body.fileExtension) {
-                // Parametros para generar la URL firmada para subir template del contrato
-                const params = {
-                    Bucket: this.bucketName,
-                    Key: `${Constants.ENTITY}/${PK}_${PK}.${body.fileExtension}`,
-                    ContentType: "binary/octet-stream",
-                    Expires: 360,
-                };
-                url = await this.s3.getSignedUrlPromise("putObject", params);
+                url = await Utils.getFileSignedUrlPut(`${Constants.ENTITY}/${PK}_${PK}.${body.fileExtension}`);
             }
 
             await Utils.updateProjectBudget(Constants.ENTITY, body, currentRequisition, header.status === Constants.STATUS.REJECTED);

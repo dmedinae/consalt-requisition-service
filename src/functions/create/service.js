@@ -4,7 +4,7 @@ const { BaseDao, BaseObject } = require("@inlaweb/base-node");
 const { Utils } = require("@inlaweb/consalt-utils-node");
 const Constants = require("../../commons/constants/objects");
 const moment = require("moment-timezone");
-const S3 = require("aws-sdk").S3;
+
 
 /**
  * Service class.
@@ -16,11 +16,9 @@ class Service extends BaseObject {
      */
     constructor() {
         super();
-        this.s3 = new S3();
         this.dao = new BaseDao();
         this.table = process.env.TABLE_NAME;
         this.permissionTable = process.env.TABLE_PERMISSIONS_NAME;
-        this.bucketName = process.env.BUCKET_NAME;
     }
 
     /**
@@ -68,7 +66,7 @@ class Service extends BaseObject {
             body.relation1 = `${body.project}|${creationDate}`;
             body.relation2 = `${creationDate}`;
             body.relation3 = `${Constants.STATUS.PENDING_APPROVAL}|${body.project}`;
-            body.relation4 = project.frameProject ? `${Constants.STATUS.PENDING_APPROVAL}|${project.frameProject}` : undefined;
+            body.relation4 = `${Constants.STATUS.PENDING_APPROVAL}|${project.frameProject}`;
 
             const PK = await this.dao.getId(this.table, Constants.ENTITY);
 
@@ -107,14 +105,7 @@ class Service extends BaseObject {
             let url;
 
             if (this.event.body.fileExtension) {
-                // Parametros para generar la URL firmada para subir template del contrato
-                const params = {
-                    Bucket: this.bucketName,
-                    Key: `${Constants.ENTITY}/${PK}_${PK}.${body.fileExtension}`,
-                    ContentType: "binary/octet-stream",
-                    Expires: 360,
-                };
-                url = await this.s3.getSignedUrlPromise("putObject", params);
+                url = await Utils.getFileSignedUrlPut(`${Constants.ENTITY}/${PK}_${PK}.${body.fileExtension}`);
             }
 
             await Utils.updateProjectBudget(Constants.ENTITY, body);

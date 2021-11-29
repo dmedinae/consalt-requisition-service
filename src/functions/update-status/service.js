@@ -60,7 +60,7 @@ class Service extends BaseObject {
             }
             // Se completan datos en el header
             body.relation3 = header.relation3.replace(header.status, body.status);
-            body.relation4 = header.relation4 ? header.relation3.replace(header.status, body.status) : undefined;
+            body.relation4 = header.relation4.replace(header.status, body.status);
 
             for (let element of current) {
                 if (element.PK !== element.SK) {
