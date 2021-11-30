@@ -4,7 +4,6 @@ const { BaseDao, BaseObject } = require("@inlaweb/base-node");
 const Constants = require("../../commons/constants/objects");
 const { Utils } = require("@inlaweb/consalt-utils-node");
 const moment = require("moment-timezone");
-const S3 = require("aws-sdk").S3;
 
 /**
  * Service class.
@@ -16,7 +15,6 @@ class Service extends BaseObject {
      */
     constructor() {
         super();
-        this.s3 = new S3();
         this.dao = new BaseDao();
         this.table = process.env.TABLE_NAME;
         this.permissionTable = process.env.TABLE_PERMISSIONS_NAME;

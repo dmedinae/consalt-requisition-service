@@ -55,7 +55,7 @@ class Service extends BaseObject {
                 parameters: [
                     { name: "PK", value: body.PK, operator: "=" }
                 ],
-                projectionExpression: "PK,SK,project,item,quantity,relation3,realtion4,fileExtension,approverName"
+                projectionExpression: "PK,SK,status,project,item,quantity,relation3,relation4,fileExtension,approverName,approverUser,requireDate,motive,observations"
             };
             const requisition = await this.dao.query(this.table, params);
 
@@ -65,10 +65,10 @@ class Service extends BaseObject {
 
             const header = requisition.find(elem => elem.PK === elem.SK);
 
-            const project = await this.dao.get(this.table, header.project, header.project, "storer,frameProject");
-            const frame = project.frameProject ? await this.dao.get(this.table, project.frameProject, project.frameProject, "storer") : undefined;
+            const project = await this.dao.get(this.table, header.project, header.project, "PK,storer,frameProject");
+            const frame = await this.dao.get(this.table, project.frameProject, project.frameProject, "PK,storer");
 
-            if ((frame && frame.storer !== this.tokenData["custom:id"]) || (!frame && project.storer !== this.tokenData["custom:id"])) {
+            if (frame.storer !== this.tokenData["custom:id"] || !frame || !project || header.status !== Constants.STATUS.APPROVED) {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
 
@@ -115,8 +115,7 @@ class Service extends BaseObject {
                     body: {
                         requisition: header.PK,
                         frame: frame.PK,
-                        project: !frame ? header.project : undefined,
-                        destination: !frame ? "ENDD" : header.project,
+                        destination: header.project,
                         requireDate: header.requireDate,
                         motive: header.motive,
                         observations: header.observations,
@@ -126,10 +125,11 @@ class Service extends BaseObject {
                         items: itemsRequest
                     }
                 }
-                const response = await Utils.invokeLambda(process.env.LAMBDA_REQUEST_CREATE, payload);
+                const response = await Utils.invokeLambda(process.env.LAMBDA_OUT_CREATE, payload);
                 this.createLog("info", "Response OUT", response);
                 const responsePayload = JSON.parse(response.Payload);
-                out = responsePayload && responsePayload.body ? responsePayload.body.PK : undefined;
+                const body = responsePayload && responsePayload.body ? JSON.parse(responsePayload.body) : undefined;
+                out = body && body.body ? body.body.PK : undefined;
             }
 
             let request;
@@ -139,17 +139,18 @@ class Service extends BaseObject {
                     body: {
                         requisition: header.PK,
                         frame: frame.PK,
-                        project: !frame ? header.project : undefined,
+                        project: header.project,
                         requireDate: header.requireDate,
                         motive: header.motive,
                         observations: header.observations,
                         items: itemsRequest
                     }
                 }
-                const response = await Utils.invokeLambda(process.env.LAMBDA_OUT_CREATE, payload);
+                const response = await Utils.invokeLambda(process.env.LAMBDA_REQUEST_CREATE, payload);
                 this.createLog("info", "Response REQUEST", response);
                 const responsePayload = JSON.parse(response.Payload);
-                request = responsePayload && responsePayload.body ? responsePayload.body.PK : undefined;
+                const body = responsePayload && responsePayload.body ? JSON.parse(responsePayload.body) : undefined;
+                request = body && body.body ? body.body.PK : undefined;
             }
 
             if (itemsBag.length) {
@@ -192,7 +193,7 @@ class Service extends BaseObject {
             const transactionOperations = [];
 
             header.relation3 = header.relation3.replace(Constants.STATUS.APPROVED, Constants.STATUS.PROCCESS);
-            header.relation4 = header.relation4 ? header.relation3.replace(Constants.STATUS.APPROVED, Constants.STATUS.PROCCESS) : undefined;
+            header.relation4 = header.relation4.replace(Constants.STATUS.APPROVED, Constants.STATUS.PROCCESS);
             header.request = request;
             header.out = out;
 
