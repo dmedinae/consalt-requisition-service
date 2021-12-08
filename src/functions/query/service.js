@@ -101,19 +101,19 @@ class Service extends BaseObject {
         if (body.project && body.status) {
             searchParameters.indexName = "GSI3";
             searchParameters.parameters = [
-                { name: "entity", value: Constants.ENTITY, operator: "=" },
+                { name: "entity", value: entity, operator: "=" },
                 { name: "relation3", value: `${body.status}|${body.project}`, operator: "=" },
             ];
         } else if (body.status) {
             searchParameters.indexName = "GSI3";
             searchParameters.parameters = [
-                { name: "entity", value: Constants.ENTITY, operator: "=" },
+                { name: "entity", value: entity, operator: "=" },
                 { name: "relation3", value: `${body.status}|`, operator: "begins_with" },
             ];
         } else if (body.project) {
             searchParameters.indexName = "GSI1";
             searchParameters.parameters = [
-                { name: "entity", value: Constants.ENTITY, operator: "=" },
+                { name: "entity", value: entity, operator: "=" },
                 { name: "relation1", value: `${body.project}|`, operator: "begins_with" },
             ];
         } else if (body.startDate && body.finishDate) {
