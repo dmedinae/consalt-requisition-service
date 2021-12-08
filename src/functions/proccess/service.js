@@ -91,6 +91,7 @@ class Service extends BaseObject {
                         item: item.item,
                         quantity: recieveItem.out
                     });
+                    item.associatedOut = { quantity: recieveItem.out };
                 }
 
                 if (recieveItem.request > 0) {
@@ -98,6 +99,7 @@ class Service extends BaseObject {
                         item: item.item,
                         quantity: recieveItem.request
                     });
+                    item.associatedRequest = { quantity: recieveItem.request };
                 }
 
                 if (recieveItem.bag > 0) {
@@ -105,6 +107,7 @@ class Service extends BaseObject {
                         item: item.item,
                         quantity: recieveItem.bag
                     });
+                    item.bagQuantity = recieveItem.bag
                 }
             }
 
@@ -200,6 +203,8 @@ class Service extends BaseObject {
             for (let item of items) {
                 item.relation3 = header.relation3;
                 item.relation4 = header.relation4;
+                if (item.associatedOut) item.associatedOut.PK = out;
+                if (item.associatedRequest) item.associatedRequest.PK = request;
                 transactionOperations.push(this.createItemUpdateOperation(item, body.PK));
             }
 
@@ -223,7 +228,10 @@ class Service extends BaseObject {
      createItemUpdateOperation(item, PK) {
         const itemUpdate = {
             relation3: item.relation3,
-            relation4: item.relation4
+            relation4: item.relation4,
+            associatedOut: item.associatedOut,
+            associatedRequest: item.associatedRequest,
+            bagQuantity: item.bagQuantity
         };
         const setAttributes = Object.keys(item);
         return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
