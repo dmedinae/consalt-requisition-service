@@ -125,7 +125,7 @@ class Service extends BaseObject {
                         fileExtension: header.fileExtension,
                         approverName: header.approverName,
                         approverUser: header.approverUser,
-                        items: itemsRequest
+                        items: itemsOut
                     }
                 }
                 const response = await Utils.invokeLambda(process.env.LAMBDA_OUT_CREATE, payload);
