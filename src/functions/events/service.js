@@ -95,11 +95,11 @@ class Service extends BaseObject {
             const items = currentRequisition.filter(elem => elem.PK !== elem.SK);
             const associatePK = this.event.out;
 
-            header.associateOut = header.associateOut ? header.associateOut.push(associatePK) : [associatePK];
+            header.associateOut ? header.associateOut.push(associatePK) : [associatePK];
 
             for (let item of this.event.items) {
                 const currentItem = items.find(elem => elem.item === item.item);
-                currentItem.associateOut = currentItem.associateOut ? currentItem.associateOut.push(associatePK) : [associatePK];
+                currentItem.associateOut ? currentItem.associateOut.push(associatePK) : [associatePK];
                 transactionOperations.push(this.createItemUpdateOperationOut(currentItem, header.PK));
             }
 
