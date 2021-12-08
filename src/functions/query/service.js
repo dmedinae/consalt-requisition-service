@@ -45,8 +45,8 @@ class Service extends BaseObject {
             }
             let result;
             const data = await this.dao.query(this.table, searchParameters);
-
-            if ((this.tokenData.profile == "PROF4" || this.tokenData.profile == "PROF5" || this.tokenData.profile == "PROF6" || this.tokenData.profile == "PROF7") && !this.event.project){
+            /*
+            if ((this.tokenData.profile == "PROF4" || this.tokenData.profile == "PROF5" || this.tokenData.profile == "PROF6" || this.tokenData.profile == "PROF7") && !this.event.body.project){
                 let params = {
                     indexName: "GSI4",
                     parameters: [
@@ -60,8 +60,8 @@ class Service extends BaseObject {
                 result = data.filter(item => projects.includes(item.project));
             }else{
                 result = data;
-            }
-
+            }*/
+            result = data;
             // Si se consulta por PK y tiene adjunto se agrega
             if (this.event.body.PK) {
                 const header = result.filter(item => item.SK === this.event.body.PK);

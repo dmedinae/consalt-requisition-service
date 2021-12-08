@@ -61,7 +61,7 @@ class Service extends BaseObject {
                 transactionOperations.push(this.createItemUpdateOperation(currentItem, header.PK));
             }
 
-            const openItems = items.filter(item => item.relation3 !== `${Constants.STATUS.CLOSED}|${header.project}`);
+            const openItems = items.filter(item => !item.relation3.includes(`${Constants.STATUS.CLOSED}|`));
 
             if (!openItems.length) {
                 header.relation3 = header.relation3.replace(Constants.STATUS.PROCCESS, Constants.STATUS.CLOSED);

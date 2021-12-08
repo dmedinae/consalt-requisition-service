@@ -83,7 +83,7 @@ class Service extends BaseObject {
                 body.items[i].relation3 = body.relation3;
                 body.items[i].relation4 = body.relation4;
                 itemsPromises.push(
-                    this.createItemOperation(body.items[i], PK)
+                    this.createItemOperation(body.items[i], PK, project.frameProject)
                 )
                 PKITEM++;
                 if (itemsPromises.length >= 5 || i === (body.items.length - 1)) {
@@ -123,10 +123,10 @@ class Service extends BaseObject {
      * @param {object} payload - Data of the user.
      * @return {object} Dynamo object with the data to save.
      */
-    async createItemOperation(item, PK) {
+    async createItemOperation(item, PK, frame) {
         //Se valida el item
         const itemCoding = await this.dao.get(this.table, item.item, item.item);
-        if (!itemCoding) {
+        if (!itemCoding || itemCoding.frame != frame) {
             throw this.createResponse("INVALID_REQUEST", null, {});
         }
         item.family = itemCoding.family;

@@ -84,6 +84,12 @@ class Service extends BaseObject {
             const itemsForCreate = body.items.filter(item => !item.SK);
             let PKITEM = itemsForCreate.length ? await this.dao.getId(this.table, Constants.ENTITY_ITRQ, itemsForCreate.length) : undefined;
 
+            // Se consulta el projecto
+            const project = await this.dao.get(this.table, header.project, header.project, "name,frameProject");
+            if (!project) {
+                throw this.createResponse("INVALID_REQUEST", null, {});
+            }
+
             const processItems = {};
 
             // Se validan los items y se crean las operaciones en lotes de 10
@@ -101,7 +107,7 @@ class Service extends BaseObject {
                     } else {
                         body.items[i].SK = `${Constants.ENTITY_ITRQ}${PKITEM}`;
                         itemsPromises.push(
-                            this.createItemOperation(body.items[i], PK)
+                            this.createItemOperation(body.items[i], PK, project.frameProject)
                         )
                         PKITEM++;
                     }
@@ -171,10 +177,10 @@ class Service extends BaseObject {
      * @param {object} payload - Data of the user.
      * @return {object} Dynamo object with the data to save.
      */
-    async createItemOperation(item, PK) {
+    async createItemOperation(item, PK, frame) {
         //Se valida el item
         const itemCoding = await this.dao.get(this.table, item.item, item.item);
-        if (!itemCoding) {
+        if (!itemCoding || itemCoding.frame != frame) {
             throw this.createResponse("INVALID_REQUEST", null, {});
         }
         item.family = itemCoding.family;
