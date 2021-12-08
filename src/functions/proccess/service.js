@@ -203,8 +203,8 @@ class Service extends BaseObject {
             for (let item of items) {
                 item.relation3 = header.relation3;
                 item.relation4 = header.relation4;
-                if (item.associateOut) item.associateOut.push(out);
-                if (item.associateRequest) item.associateRequest.push(request);
+                if (out) item.associateOut.push(out);
+                if (request) item.associateRequest.push(request);
                 transactionOperations.push(this.createItemUpdateOperation(item, body.PK));
             }
 
@@ -229,8 +229,8 @@ class Service extends BaseObject {
         const itemUpdate = {
             relation3: item.relation3,
             relation4: item.relation4,
-            associatedOut: item.associatedOut,
-            associatedRequest: item.associatedRequest,
+            associateOut: item.associateOut,
+            associateRequest: item.associateRequest,
             bagQuantity: item.bagQuantity
         };
         const setAttributes = Object.keys(item);
@@ -249,6 +249,8 @@ class Service extends BaseObject {
             relation4: payload.relation4,
             request: payload.request,
             out: payload.out,
+            associateOut: payload.associateOut,
+            associateRequest: payload.associateRequest,
             status: Constants.STATUS.PROCCESS,
             proccessDate: approveDate,
             proccessName: this.tokenData.name,

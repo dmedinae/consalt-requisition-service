@@ -48,17 +48,17 @@ class Service extends BaseObject {
             const items = currentRequisition.filter(elem => elem.PK !== elem.SK);
             const associatePK = this.event.in;
 
-            header.associateIn = header.associateIn ? header.associateIn.push(associatePK) : [associatePK];
+            header.associateIn ? header.associateIn.push(associatePK) : [associatePK];
 
             for (let item of this.event.items) {
                 const currentItem = items.find(elem => elem.item === item.item);
-                currentItem.associateIn = currentItem.associateIn ? currentItem.associateIn.push(associatePK) : [associatePK];
+                currentItem.associateIn ? currentItem.associateIn.push(associatePK) : [associatePK];
                 currentItem.associateQuantity = currentItem.associateQuantity ? currentItem.associateQuantity += item.quantity : item.quantity;
                 if (currentItem.associateQuantity === currentItem.quantity) {
                     currentItem.relation3 = currentItem.relation3.replace(header.status, Constants.STATUS.CLOSED);
                     currentItem.relation4 = currentItem.relation4 ? currentItem.relation4.replace(header.status, Constants.STATUS.CLOSED) : undefined;
                 }
-                transactionOperations.push(this.createItemUpdateOperation(currentItem, header.PK));
+                transactionOperations.push(this.createItemUpdateOperationIn(currentItem, header.PK));
             }
 
             const openItems = items.filter(item => !item.relation3.includes(`${Constants.STATUS.CLOSED}|`));
@@ -69,7 +69,7 @@ class Service extends BaseObject {
                 header.status = Constants.STATUS.CLOSED;
             }
 
-            transactionOperations.push(this.createRequisitionObject(header))
+            transactionOperations.push(this.createRequisitionObjectIn(header))
 
             await this.dao.writeTransactions(transactionOperations, 24);
         } catch (error) {
