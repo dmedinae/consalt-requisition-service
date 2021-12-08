@@ -52,8 +52,7 @@ class Service extends BaseObject {
 
             for (let item of this.event.items) {
                 const currentItem = items.find(elem => elem.item === item.item);
-                const associateObject = {PK: associatePK, quantity: item.quantity};
-                currentItem.associate = currentItem.associate ? currentItem.associate.push(associateObject) : [associateObject];
+                currentItem.associate = currentItem.associate ? currentItem.associate.push(associatePK) : [associatePK];
                 currentItem.associateQuantity = currentItem.associateQuantity ? currentItem.associateQuantity += item.quantity : item.quantity;
                 if (currentItem.associateQuantity === currentItem.quantity) {
                     currentItem.relation3 = currentItem.relation3.replace(header.status, Constants.STATUS.CLOSED);
