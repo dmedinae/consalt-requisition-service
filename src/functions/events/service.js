@@ -31,7 +31,7 @@ class Service extends BaseObject {
      * Function to save a item.
      * @return {object} The object with the respective PK.
      */
-    async associate() {
+    async inCreated() {
         try {
             const transactionOperations = [];
             // Se consulta la requisición actual y sus items
@@ -46,13 +46,13 @@ class Service extends BaseObject {
 
             const header = currentRequisition.find(elem => elem.PK === elem.SK);
             const items = currentRequisition.filter(elem => elem.PK !== elem.SK);
-            const associatePK = this.event.out || this.event.in;
+            const associatePK = this.event.in;
 
-            header.associate = header.associate ? header.associate.push(associatePK) : [associatePK];
+            header.associateIn = header.associateIn ? header.associateIn.push(associatePK) : [associatePK];
 
             for (let item of this.event.items) {
                 const currentItem = items.find(elem => elem.item === item.item);
-                currentItem.associate = currentItem.associate ? currentItem.associate.push(associatePK) : [associatePK];
+                currentItem.associateIn = currentItem.associateIn ? currentItem.associateIn.push(associatePK) : [associatePK];
                 currentItem.associateQuantity = currentItem.associateQuantity ? currentItem.associateQuantity += item.quantity : item.quantity;
                 if (currentItem.associateQuantity === currentItem.quantity) {
                     currentItem.relation3 = currentItem.relation3.replace(header.status, Constants.STATUS.CLOSED);
@@ -73,39 +73,78 @@ class Service extends BaseObject {
 
             await this.dao.writeTransactions(transactionOperations, 24);
         } catch (error) {
-            console.log(error);
             this.createLog("error", "Service error", error);
             throw error;
         }
     }
 
-    /**
-     * Function to format the data to save in DDB.
-     * @param {object} payload - Data of the user.
-     * @return {object} Dynamo object with the data to save.
-     */
-    createItemUpdateOperation(item, PK) {
+    async outCreated() {
+        try {
+            const transactionOperations = [];
+
+            const params = {
+                indexName: "",
+                parameters: [{ name: "PK", value: this.event.requisition, operator: "=" }],
+            };
+            const currentRequisition = await this.dao.query(this.table, params);
+            if (!currentRequisition.length) {
+                throw this.createResponse("REQI_NO_FOUND", null, {});
+            }
+
+            const header = currentRequisition.find(elem => elem.PK === elem.SK);
+            const items = currentRequisition.filter(elem => elem.PK !== elem.SK);
+            const associatePK = this.event.out;
+
+            header.associateOut = header.associateOut ? header.associateOut.push(associatePK) : [associatePK];
+
+            for (let item of this.event.items) {
+                const currentItem = items.find(elem => elem.item === item.item);
+                currentItem.associateOut = currentItem.associateOut ? currentItem.associateOut.push(associatePK) : [associatePK];
+                transactionOperations.push(this.createItemUpdateOperationOut(currentItem, header.PK));
+            }
+
+            transactionOperations.push(this.createRequisitionObjectOut(header))
+
+            await this.dao.writeTransactions(transactionOperations, 24);
+        } catch (error) {
+            this.createLog("error", "Service error", error);
+            throw error;
+        }
+    }
+
+    createItemUpdateOperationIn(item, PK) {
         const itemUpdate = {
             relation3: item.relation3,
             relation4: item.relation4,
-            associate: item.associate,
+            associateIn: item.associateIn,
             associateQuantity: item.associateQuantity,
         };
-        const setAttributes = Object.keys(item);
+        const setAttributes = Object.keys(itemUpdate);
         return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
     }
 
-    /**
-     * Function to format the data to save in DDB.
-     * @param {object} payload - Data of the user.
-     * @return {object} Dynamo object with the data to save.
-     */
-    createRequisitionObject(payload) {
+    createRequisitionObjectIn(payload) {
         const item = {
             relation3: payload.relation3,
             relation4: payload.relation4,
             status: payload.status,
-            associate: payload.associate,
+            associateIn: payload.associateIn,
+        };
+        const setAttributes = Object.keys(item);
+        return this.dao.createUpdateParams(this.table, payload.PK, payload.PK, item, setAttributes);
+    }
+
+     createItemUpdateOperationOut(item, PK) {
+        const itemUpdate = {
+            associateOut: item.associateOut,
+        };
+        const setAttributes = Object.keys(itemUpdate);
+        return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
+    }
+
+    createRequisitionObjectOut(payload) {
+        const item = {
+            associateOut: payload.associateOut,
         };
         const setAttributes = Object.keys(item);
         return this.dao.createUpdateParams(this.table, payload.PK, payload.PK, item, setAttributes);

@@ -10,10 +10,10 @@ module.exports.events = async (event, context) => {
     try {
         switch (event.eventType) {
             case "outCreated":
-                await service.associate();
+                await service.outCreated();
                 break;
             case "inCreated":
-                await service.associate();
+                await service.inCreated();
                 break;
             default:
                 throw Error("No handler for the event");

@@ -91,7 +91,7 @@ class Service extends BaseObject {
                         item: item.item,
                         quantity: recieveItem.out
                     });
-                    item.associatedOut = { quantity: recieveItem.out };
+                    item.associateOut = item.associateOut ? item.associateOut : [];
                 }
 
                 if (recieveItem.request > 0) {
@@ -99,7 +99,7 @@ class Service extends BaseObject {
                         item: item.item,
                         quantity: recieveItem.request
                     });
-                    item.associatedRequest = { quantity: recieveItem.request };
+                    item.associateRequest = item.associateRequest ? item.associateRequest : [];
                 }
 
                 if (recieveItem.bag > 0) {
@@ -203,8 +203,8 @@ class Service extends BaseObject {
             for (let item of items) {
                 item.relation3 = header.relation3;
                 item.relation4 = header.relation4;
-                if (item.associatedOut) item.associatedOut.PK = out;
-                if (item.associatedRequest) item.associatedRequest.PK = request;
+                if (item.associateOut) item.associateOut.push(out);
+                if (item.associateRequest) item.associateRequest.push(request);
                 transactionOperations.push(this.createItemUpdateOperation(item, body.PK));
             }
 
