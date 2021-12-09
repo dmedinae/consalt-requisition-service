@@ -69,6 +69,8 @@ class Service extends BaseObject {
             body.relation4 = `${Constants.STATUS.PENDING_APPROVAL}|${project.frameProject}`;
 
             const PK = await this.dao.getId(this.table, Constants.ENTITY);
+            body.creationDate = creationDate;
+            body.PK = PK;
 
             let PKITEM = await this.dao.getId(this.table, Constants.ENTITY_ITRQ, body.items.length);
 
