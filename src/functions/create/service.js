@@ -97,7 +97,6 @@ class Service extends BaseObject {
                 }
             }
 
-            // Se construye el encabezado
             transactionOperations.push({ Put: { TableName: this.table, Item: this.createRequisitionObject(body, PK) } })
 
             await this.dao.writeTransactions(transactionOperations, 24);
