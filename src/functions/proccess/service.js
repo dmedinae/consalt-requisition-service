@@ -55,7 +55,7 @@ class Service extends BaseObject {
                 parameters: [
                     { name: "PK", value: body.PK, operator: "=" }
                 ],
-                projectionExpression: "PK,SK,status,project,item,quantity,relation3,relation4,fileExtension,approverName,approverUser,requireDate,motive,observations"
+                projectionExpression: "PK,SK,status,project,item,quantity,relation3,relation4,fileExtension,approverName,approverUser,requireDate,motive,observations,associateRequest,associateOut"
             };
             const requisition = await this.dao.query(this.table, params);
 
@@ -122,7 +122,6 @@ class Service extends BaseObject {
                         requireDate: header.requireDate,
                         motive: header.motive,
                         observations: header.observations,
-                        fileExtension: header.fileExtension,
                         approverName: header.approverName,
                         approverUser: header.approverUser,
                         items: itemsOut
@@ -141,6 +140,9 @@ class Service extends BaseObject {
                     headers: this.event.headers,
                     body: {
                         requisition: header.PK,
+                        fileExtension: header.fileExtension,
+                        approverName: header.approverName,
+                        approverUser: header.approverUser,
                         frame: frame.PK,
                         project: header.project,
                         requireDate: header.requireDate,
@@ -203,8 +205,8 @@ class Service extends BaseObject {
             for (let item of items) {
                 item.relation3 = header.relation3;
                 item.relation4 = header.relation4;
-                if (out) item.associateOut.push(out);
-                if (request) item.associateRequest.push(request);
+                if (out && item.associateOut) item.associateOut.push(out);
+                if (request && item.associateRequest) item.associateRequest.push(request);
                 transactionOperations.push(this.createItemUpdateOperation(item, body.PK));
             }
 
