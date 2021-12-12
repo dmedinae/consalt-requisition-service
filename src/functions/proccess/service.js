@@ -54,8 +54,7 @@ class Service extends BaseObject {
                 indexName: "",
                 parameters: [
                     { name: "PK", value: body.PK, operator: "=" }
-                ],
-                projectionExpression: "PK,SK,status,project,item,quantity,relation3,relation4,fileExtension,approverName,approverUser,requireDate,motive,observations,associateRequest,associateOut"
+                ]
             };
             const requisition = await this.dao.query(this.table, params);
 
@@ -106,11 +105,18 @@ class Service extends BaseObject {
                     itemsBag.push({
                         item: item.item,
                         project: item.project,
-                        family: item.family,
+                        familyName: item.familyName,
                         group: item.group,
+                        groupName: item.groupName,
+                        type: item.type,
+                        typeName: item.typeName,
+                        category: item.category,
+                        categoryName: item.categoryName,
                         code: item.code,
                         name: item.name,
                         unity: item.unity,
+                        unityName: item.unityName,
+                        affectBudget: item.affectBudget,
                         value: item.value,
                         quantity: recieveItem.bag
                     });
