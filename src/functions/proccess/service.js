@@ -105,6 +105,13 @@ class Service extends BaseObject {
                 if (recieveItem.bag > 0) {
                     itemsBag.push({
                         item: item.item,
+                        project: item.project,
+                        family: item.family,
+                        group: item.group,
+                        code: item.code,
+                        name: item.name,
+                        unity: item.unity,
+                        value: item.value,
                         quantity: recieveItem.bag
                     });
                     item.bagQuantity = recieveItem.bag
@@ -167,6 +174,13 @@ class Service extends BaseObject {
                         putItemsBag.push({
                             PK: bagPK,
                             SK: itemBag.item,
+                            project: itemBag.project,
+                            family: itemBag.family,
+                            group: itemBag.group,
+                            code: itemBag.code,
+                            name: itemBag.name,
+                            unity: itemBag.unity,
+                            value: itemBag.value,
                             quantity: 0
                         });
                     }
