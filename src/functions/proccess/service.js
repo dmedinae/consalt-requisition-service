@@ -173,7 +173,7 @@ class Service extends BaseObject {
             }
 
             if (itemsBag.length) {
-                const bagPK = project.frameProject ? project.frameProject.replace("FRAM", "BAGF") : header.project.replace("PROJ", "BAGP");
+                const bagPK = project.frameProject.replace("FRAM", "BAGF");
                 const putItemsBag = []
                 for (let itemBag of itemsBag) {
                     const currentItemBag = await this.dao.get(this.table, bagPK, itemBag.item, "PK");
