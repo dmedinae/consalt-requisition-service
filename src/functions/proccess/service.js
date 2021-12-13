@@ -105,6 +105,7 @@ class Service extends BaseObject {
                     itemsBag.push({
                         item: item.item,
                         project: item.project,
+                        family: item.family,
                         familyName: item.familyName,
                         group: item.group,
                         groupName: item.groupName,
@@ -182,10 +183,18 @@ class Service extends BaseObject {
                             SK: itemBag.item,
                             project: itemBag.project,
                             family: itemBag.family,
+                            familyName: itemBag.familyName,
                             group: itemBag.group,
+                            groupName: itemBag.groupName,
+                            type: itemBag.type,
+                            typeName: itemBag.typeName,
+                            category: itemBag.category,
+                            categoryName: itemBag.categoryName,
                             code: itemBag.code,
                             name: itemBag.name,
                             unity: itemBag.unity,
+                            unityName: itemBag.unityName,
+                            affectBudget: itemBag.affectBudget,
                             value: itemBag.value,
                             quantity: 0
                         });
