@@ -264,7 +264,7 @@ class Service extends BaseObject {
             associateRequest: item.associateRequest,
             bagQuantity: item.bagQuantity
         };
-        const setAttributes = Object.keys(item);
+        const setAttributes = Object.keys(itemUpdate);
         return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
     }
 
