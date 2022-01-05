@@ -45,7 +45,7 @@ class Service extends BaseObject {
             const params = {
                 indexName: "",
                 parameters: [{ name: "PK", value: body.PK, operator: "=" }],
-                projectionExpression: "PK,SK,project,status,relation3,relation4,family,group,value,quantity,creationDate"
+                projectionExpression: "PK,SK,project,status,relation3,relation4,family,group,value,quantity,creationDate,creationUser"
             };
             const current = await this.dao.query(this.table, params);
             if (!current.length) {
@@ -80,6 +80,17 @@ class Service extends BaseObject {
                 await Utils.updateProjectBudget(Constants.ENTITY, undefined, current);
             }
 
+            const mailPayload = {
+                "eventType": "requisitionApproval",
+                "payload": {
+                    "PK": body.PK,
+                    "status": body.status,
+                    "creationUser": header.creationUser,
+                    "approverName": this.tokenData.name,
+                    "reason": payload.reason
+                }
+            };
+            await Utils.sendMail(mailPayload);
             // Se retorna el id insertado
             return { PK: body.PK };
         } catch (error) {
