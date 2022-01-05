@@ -43,7 +43,7 @@ class Service extends BaseObject {
             const transactionOperations = [];
             const body = this.event.body;
             // Se consulta el projecto
-            const project = await this.dao.get(this.table, body.project, body.project, "name,frameProject");
+            const project = await this.dao.get(this.table, body.project, body.project, "name,frameProject,frameProjectName");
             if (!project) {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
@@ -62,6 +62,8 @@ class Service extends BaseObject {
             const requireDate = moment(new Date(body.requireDate)).format("YYYY-MM-DD");
             body.requireDate = requireDate;
             body.projectName = project.name;
+            body.frame = project.frameProject;
+            body.frameName = project.frameProject;
             body.creationDate = creationDate;
             body.relation1 = `${body.project}|${creationDate}`;
             body.relation2 = `${creationDate}`;
@@ -183,6 +185,8 @@ class Service extends BaseObject {
             relation4: payload.relation4,
             project: payload.project,
             projectName: payload.projectName,
+            frame: payload.frame,
+            frameName: payload.frameName,
             requireDate: payload.requireDate,
             motive: payload.motive,
             observations: payload.observations,
