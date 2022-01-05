@@ -87,7 +87,7 @@ class Service extends BaseObject {
                     "status": body.status,
                     "creationUser": header.creationUser,
                     "approverName": this.tokenData.name,
-                    "reason": payload.reason
+                    "reason": body.reason
                 }
             };
             await Utils.sendMail(mailPayload);
