@@ -16,6 +16,9 @@
         },
         {
             "properties": {
+                "typeSearch": {
+                    "enum": ["S", "R"]
+                },
                 "project": {
                     "type": "string",
                     "pattern": "^PROJ[0-9]+$",
