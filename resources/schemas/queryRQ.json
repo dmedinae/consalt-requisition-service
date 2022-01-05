@@ -25,7 +25,7 @@
                     "maxLength": 11
                 },
                 "status": {
-                    "enum": ["PENDING_APPROVAL","APPROVED","REJECTED","CANCELED"]
+                    "enum": ["PENDING_APPROVAL","APPROVED","REJECTED","CANCELED","CLOSED"]
                 }
             },
             "minProperties": 1,
