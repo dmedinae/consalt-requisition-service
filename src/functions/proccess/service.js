@@ -54,8 +54,7 @@ class Service extends BaseObject {
                 indexName: "",
                 parameters: [
                     { name: "PK", value: body.PK, operator: "=" }
-                ],
-                projectionExpression: "PK,SK,status,project,item,quantity,relation3,relation4,fileExtension,approverName,approverUser,requireDate,motive,observations"
+                ]
             };
             const requisition = await this.dao.query(this.table, params);
 
@@ -105,6 +104,21 @@ class Service extends BaseObject {
                 if (recieveItem.bag > 0) {
                     itemsBag.push({
                         item: item.item,
+                        project: item.project,
+                        family: item.family,
+                        familyName: item.familyName,
+                        group: item.group,
+                        groupName: item.groupName,
+                        type: item.type,
+                        typeName: item.typeName,
+                        category: item.category,
+                        categoryName: item.categoryName,
+                        code: item.code,
+                        name: item.name,
+                        unity: item.unity,
+                        unityName: item.unityName,
+                        affectBudget: item.affectBudget,
+                        value: item.value,
                         quantity: recieveItem.bag
                     });
                     item.bagQuantity = recieveItem.bag
@@ -122,7 +136,6 @@ class Service extends BaseObject {
                         requireDate: header.requireDate,
                         motive: header.motive,
                         observations: header.observations,
-                        fileExtension: header.fileExtension,
                         approverName: header.approverName,
                         approverUser: header.approverUser,
                         items: itemsOut
@@ -141,6 +154,9 @@ class Service extends BaseObject {
                     headers: this.event.headers,
                     body: {
                         requisition: header.PK,
+                        fileExtension: header.fileExtension,
+                        approverName: header.approverName,
+                        approverUser: header.approverUser,
                         frame: frame.PK,
                         project: header.project,
                         requireDate: header.requireDate,
@@ -157,7 +173,7 @@ class Service extends BaseObject {
             }
 
             if (itemsBag.length) {
-                const bagPK = project.frameProject ? project.frameProject.replace("FRAM", "BAGF") : header.project.replace("PROJ", "BAGP");
+                const bagPK = project.frameProject.replace("FRAM", "BAGF");
                 const putItemsBag = []
                 for (let itemBag of itemsBag) {
                     const currentItemBag = await this.dao.get(this.table, bagPK, itemBag.item, "PK");
@@ -165,6 +181,21 @@ class Service extends BaseObject {
                         putItemsBag.push({
                             PK: bagPK,
                             SK: itemBag.item,
+                            project: itemBag.project,
+                            family: itemBag.family,
+                            familyName: itemBag.familyName,
+                            group: itemBag.group,
+                            groupName: itemBag.groupName,
+                            type: itemBag.type,
+                            typeName: itemBag.typeName,
+                            category: itemBag.category,
+                            categoryName: itemBag.categoryName,
+                            code: itemBag.code,
+                            name: itemBag.name,
+                            unity: itemBag.unity,
+                            unityName: itemBag.unityName,
+                            affectBudget: itemBag.affectBudget,
+                            value: itemBag.value,
                             quantity: 0
                         });
                     }
@@ -203,8 +234,8 @@ class Service extends BaseObject {
             for (let item of items) {
                 item.relation3 = header.relation3;
                 item.relation4 = header.relation4;
-                if (out) item.associateOut.push(out);
-                if (request) item.associateRequest.push(request);
+                if (out && item.associateOut) item.associateOut.push(out);
+                if (request && item.associateRequest) item.associateRequest.push(request);
                 transactionOperations.push(this.createItemUpdateOperation(item, body.PK));
             }
 
@@ -233,7 +264,7 @@ class Service extends BaseObject {
             associateRequest: item.associateRequest,
             bagQuantity: item.bagQuantity
         };
-        const setAttributes = Object.keys(item);
+        const setAttributes = Object.keys(itemUpdate);
         return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
     }
 

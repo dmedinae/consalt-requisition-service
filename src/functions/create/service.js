@@ -132,11 +132,19 @@ class Service extends BaseObject {
             throw this.createResponse("INVALID_REQUEST", null, {});
         }
         item.family = itemCoding.family;
+        item.familyName = itemCoding.familyName;
         item.group = itemCoding.group;
+        item.groupName = itemCoding.groupName;
+        item.type = itemCoding.type;
+        item.typeName = itemCoding.typeName;
+        item.category = itemCoding.category;
+        item.categoryName = itemCoding.categoryName;
         item.code = itemCoding.code;
         item.name = itemCoding.name;
-        item.unity = itemCoding.unityName;
+        item.unity = itemCoding.unity;
+        item.unityName = itemCoding.unityName;
         item.value = itemCoding.unitValue;
+        item.affectBudget = itemCoding.affectBudget;
         return { Put: { TableName: this.table, Item: this.createItemObject(PK, item) } };
     }
 
@@ -157,12 +165,20 @@ class Service extends BaseObject {
             item: item.item,
             project: item.project,
             family: item.family,
+            familyName: item.familyName,
             group: item.group,
+            groupName: item.groupName,
+            type: item.type,
+            typeName: item.typeName,
+            category: item.category,
+            categoryName: item.categoryName,
             code: item.code,
             name: item.name,
             unity: item.unity,
+            unityName: item.unityName,
             value: item.value,
             quantity: item.quantity,
+            affectBudget: item.affectBudget,
             creatorName: this.tokenData.name,
             creationUser: this.tokenData["cognito:username"],
             creationDate: item.creationDate,
