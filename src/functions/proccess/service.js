@@ -90,7 +90,6 @@ class Service extends BaseObject {
                         item: item.item,
                         quantity: recieveItem.out
                     });
-                    item.associateQuantity = recieveItem.out;
                     item.associateOut = item.associateOut ? item.associateOut : [];
                 }
 
@@ -261,7 +260,6 @@ class Service extends BaseObject {
         const itemUpdate = {
             relation3: item.relation3,
             relation4: item.relation4,
-            associateQuantity: item.associateQuantity,
             associateOut: item.associateOut,
             associateRequest: item.associateRequest,
             bagQuantity: item.bagQuantity
