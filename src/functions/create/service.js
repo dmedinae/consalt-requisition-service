@@ -64,7 +64,7 @@ class Service extends BaseObject {
             body.projectName = project.name;
             body.projectCostCenter = project.costCenter;
             body.frame = project.frameProject;
-            body.frameName = project.frameProject;
+            body.frameName = project.frameProjectName;
             body.creationDate = creationDate;
             body.relation1 = `${body.project}|${creationDate}`;
             body.relation2 = `${creationDate}`;
