@@ -76,8 +76,8 @@ class Service extends BaseObject {
             body.creatorPositionName = user.positionName;
             body.relation1 = `${body.project}|${creationDate}`;
             body.relation2 = `${creationDate}`;
-            body.relation3 = `${Constants.STATUS.PENDING_APPROVAL}|${body.project}`;
-            body.relation4 = `${Constants.STATUS.PENDING_APPROVAL}|${project.frameProject}`;
+            body.relation3 = `${Constants.STATUS.PENDING_APPROVAL}|${body.project}|${creationDate}`;
+            body.relation4 = `${Constants.STATUS.PENDING_APPROVAL}|${project.frameProject}|${creationDate}`;
 
             const PK = await this.dao.getId(this.table, Constants.ENTITY);
             body.PK = PK;

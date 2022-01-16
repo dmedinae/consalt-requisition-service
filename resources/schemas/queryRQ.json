@@ -38,7 +38,7 @@
             },
             "minProperties": 2,
             "additionalProperties": false,
-            "required": ["typeSearch"]
+            "required": ["typeSearch", "project"]
         },
         {
             "properties": {

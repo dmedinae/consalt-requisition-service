@@ -98,38 +98,23 @@ class Service extends BaseObject {
             searchParameters.projectionExpression = entity === Constants.ENTITY ? Constants.REPORT_PROJECTION : Constants.REPORT_ITEMS_PROJECTION;
         }
 
-        if (body.project && body.status) {
+        if (body.startDate && body.finishDate && body.status) {
             searchParameters.indexName = "GSI3";
             searchParameters.parameters = [
                 { name: "entity", value: entity, operator: "=" },
-                { name: "relation3", value: `${body.status}|${body.project}`, operator: "=" },
+                { name: "relation3", value: `${body.status}|${body.project}|${startDate}`, value1: `${body.status}|${body.project}|${finishDate}`, operator: "BETWEEN" },
+            ];
+        } else if (body.startDate && body.finishDate) {
+            searchParameters.indexName = "GSI1";
+            searchParameters.parameters = [
+                { name: "entity", value: entity, operator: "=" },
+                { name: "relation1", value: `${body.project}|${startDate}`, value1: `${body.project}|${finishDate}`, operator: "BETWEEN" },
             ];
         } else if (body.status) {
             searchParameters.indexName = "GSI3";
             searchParameters.parameters = [
                 { name: "entity", value: entity, operator: "=" },
-                { name: "relation3", value: `${body.status}|`, operator: "begins_with" },
-            ];
-        } else if (body.project) {
-            searchParameters.indexName = "GSI1";
-            searchParameters.parameters = [
-                { name: "entity", value: entity, operator: "=" },
-                { name: "relation1", value: `${body.project}|`, operator: "begins_with" },
-            ];
-        } else if (body.startDate && body.finishDate) {
-            let index = "GSI2";
-            let relation = "relation2";
-            let project = "";
-            let creationUser = "";
-            if (body.project) {
-                index = "GSI1";
-                relation = "relation1";
-                project = `${body.project}|`;
-            }
-            searchParameters.indexName = index;
-            searchParameters.parameters = [
-                { name: "entity", value: entity, operator: "=" },
-                { name: relation, value: `${project}${creationUser}${startDate}`, value1: `${project}${creationUser}${finishDate}`, operator: "BETWEEN" },
+                { name: "relation3", value: `${body.status}|${body.project}|`, operator: "begins_with" },
             ];
         } else if (this.event.body.PK) {
             searchParameters.projectionExpression = Constants.PK_PROJECTION;
