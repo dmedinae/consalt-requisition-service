@@ -26,20 +26,6 @@
                 },
                 "status": {
                     "enum": ["PENDING_APPROVAL","APPROVED","REJECTED","CANCELED","CLOSED"]
-                }
-            },
-            "minProperties": 1,
-            "additionalProperties": false
-        },
-        {
-            "properties": {
-                "typeSearch": {
-                    "enum": ["S", "R"]
-                },
-                "project": {
-                    "type": "string",
-                    "pattern": "^PROJ[0-9]+$",
-                    "maxLength": 11
                 },
                 "startDate": {
                     "type": "string",
