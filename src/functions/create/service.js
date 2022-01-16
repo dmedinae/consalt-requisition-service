@@ -48,6 +48,12 @@ class Service extends BaseObject {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
 
+            // Se consulta el usuario que realiza el registro
+            const user = await this.dao.get(this.table, this.tokenData["custom:id"], this.tokenData["custom:id"], "areaName, positionName");
+            if (!user) {
+                throw this.createResponse("INVALID_REQUEST", null, {});
+            }
+
             // validate no duplicated items
             let itemValidation = [];
             for (let item of body.items) {
@@ -66,6 +72,8 @@ class Service extends BaseObject {
             body.frame = project.frameProject;
             body.frameName = project.frameProjectName;
             body.creationDate = creationDate;
+            body.creatorAreaName = user.areaName;
+            body.creatorPositionName = user.positionName;
             body.relation1 = `${body.project}|${creationDate}`;
             body.relation2 = `${creationDate}`;
             body.relation3 = `${Constants.STATUS.PENDING_APPROVAL}|${body.project}`;
@@ -211,6 +219,8 @@ class Service extends BaseObject {
             fileExtension: payload.fileExtension,
             status: Constants.STATUS.PENDING_APPROVAL,
             creatorName: this.tokenData.name,
+            creatorAreaName: payload.creatorAreaName,
+            creatorPositionName: payload.creatorPositionName,
             creationUser: this.tokenData["cognito:username"],
             creationDate: payload.creationDate,
         };

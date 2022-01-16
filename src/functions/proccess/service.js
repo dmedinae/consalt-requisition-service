@@ -138,6 +138,9 @@ class Service extends BaseObject {
                         observations: header.observations,
                         approverName: header.approverName,
                         approverUser: header.approverUser,
+                        requesterName: header.creatorName,
+                        requesterAreaName: header.creatorAreaName,
+                        requesterPositionName: header.creatorPositionName,
                         items: itemsOut
                     }
                 }
@@ -162,6 +165,9 @@ class Service extends BaseObject {
                         requireDate: header.requireDate,
                         motive: header.motive,
                         observations: header.observations,
+                        requesterName: header.creatorName,
+                        requesterAreaName: header.creatorAreaName,
+                        requesterPositionName: header.creatorPositionName,
                         items: itemsRequest
                     }
                 }
