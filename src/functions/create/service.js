@@ -49,7 +49,7 @@ class Service extends BaseObject {
             }
 
             // Se consulta el usuario que realiza el registro
-            const user = await this.dao.get(this.table, this.tokenData["custom:id"], this.tokenData["custom:id"], "areaName, positionName");
+            const user = await this.dao.get(this.table, this.tokenData["custom:id"], this.tokenData["custom:id"], "areaName,positionName");
             if (!user) {
                 throw this.createResponse("INVALID_REQUEST", null, {});
             }
