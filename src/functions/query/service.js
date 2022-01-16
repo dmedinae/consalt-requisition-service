@@ -116,6 +116,12 @@ class Service extends BaseObject {
                 { name: "entity", value: entity, operator: "=" },
                 { name: "relation3", value: `${body.status}|${body.project}|`, operator: "begins_with" },
             ];
+        } else if (body.project) {
+            searchParameters.indexName = "GSI1";
+            searchParameters.parameters = [
+                { name: "entity", value: entity, operator: "=" },
+                { name: "relation1", value: `${body.project}|`, operator: "begins_with" },
+            ];
         } else if (this.event.body.PK) {
             searchParameters.projectionExpression = Constants.PK_PROJECTION;
             searchParameters.indexName = "";
