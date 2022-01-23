@@ -59,7 +59,7 @@ class Service extends BaseObject {
                     indexName: "GSI3",
                     parameters: [
                         { name: "entity", value: Constants.ENTITY, operator: "=" },
-                        { name: "relation3", value: `${Constants.STATUS.PENDING_APPROVAL}|${project.PK}`, operator: "=" }
+                        { name: "relation3", value: `${Constants.STATUS.PENDING_APPROVAL}|${project.PK}|`, operator: "begins_with" }
                     ],
                     projectionExpression: "PK,creationDate,project,status,projectName,creatorName"
                 };

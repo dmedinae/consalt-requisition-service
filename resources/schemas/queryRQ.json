@@ -50,6 +50,9 @@
                     "pattern": "^PROJ[0-9]+$",
                     "maxLength": 11
                 },
+                "status": {
+                    "enum": ["PENDING_APPROVAL","APPROVED","REJECTED","CANCELED","CLOSED"]
+                },
                 "startDate": {
                     "type": "string",
                     "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2}(?:\\.\\d*)?)((-(\\d{2}):(\\d{2})|Z)?)$"
