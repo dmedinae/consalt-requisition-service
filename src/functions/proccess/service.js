@@ -141,6 +141,7 @@ class Service extends BaseObject {
                         requesterName: header.creatorName,
                         requesterAreaName: header.creatorAreaName,
                         requesterPositionName: header.creatorPositionName,
+                        costCenter: header.projectCostCenter,
                         items: itemsOut
                     }
                 }
@@ -168,6 +169,7 @@ class Service extends BaseObject {
                         requesterName: header.creatorName,
                         requesterAreaName: header.creatorAreaName,
                         requesterPositionName: header.creatorPositionName,
+                        costCenter: header.projectCostCenter,
                         items: itemsRequest
                     }
                 }
