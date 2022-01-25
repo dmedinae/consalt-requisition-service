@@ -92,7 +92,6 @@ class Service extends BaseObject {
                         quantity: recieveItem.out
                     });
                     item.associateOut = item.associateOut ? item.associateOut : [];
-                    item.associateQuantityOut = recieveItem.out;
                 }
 
                 if (recieveItem.request > 0) {
