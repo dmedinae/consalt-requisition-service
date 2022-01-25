@@ -84,6 +84,7 @@ class Service extends BaseObject {
                 }
 
                 recieveItem.bag = item.quantity - recieveItem.out - recieveItem.request;
+                item.associateQuantityOut = 0;
 
                 if (recieveItem.out > 0) {
                     itemsOut.push({
@@ -91,6 +92,7 @@ class Service extends BaseObject {
                         quantity: recieveItem.out
                     });
                     item.associateOut = item.associateOut ? item.associateOut : [];
+                    item.associateQuantityOut = recieveItem.out;
                 }
 
                 if (recieveItem.request > 0) {

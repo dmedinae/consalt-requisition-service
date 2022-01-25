@@ -99,6 +99,7 @@ class Service extends BaseObject {
 
             for (let item of this.event.items) {
                 const currentItem = items.find(elem => elem.item === item.item);
+                currentItem.associateQuantityOut = currentItem.associateQuantityOut ? currentItem.associateQuantityOut += item.quantity : item.quantity;
                 currentItem.associateOut ? currentItem.associateOut.push(associatePK) : currentItem.associateOut = [associatePK];
                 transactionOperations.push(this.createItemUpdateOperationOut(currentItem, header.PK));
             }
@@ -137,6 +138,7 @@ class Service extends BaseObject {
      createItemUpdateOperationOut(item, PK) {
         const itemUpdate = {
             associateOut: item.associateOut,
+            associateQuantityOut: item.associateQuantityOut,
         };
         const setAttributes = Object.keys(itemUpdate);
         return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
