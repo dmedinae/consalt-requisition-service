@@ -54,6 +54,9 @@ class Service extends BaseObject {
                 const currentItem = items.find(elem => elem.item === item.item);
                 currentItem.associateIn ? currentItem.associateIn.push(associatePK) : currentItem.associateIn = [associatePK];
                 currentItem.associateQuantity = currentItem.associateQuantity ? currentItem.associateQuantity += item.quantity : item.quantity;
+                if (currentItem.associateQuantityOut && this.event.comeFromRequisitionOut) {
+                    currentItem.associateQuantityOut -= item.quantity;
+                }
                 if (currentItem.associateQuantity === currentItem.quantity) {
                     currentItem.relation3 = currentItem.relation3.replace(header.status, Constants.STATUS.CLOSED);
                     currentItem.relation4 = currentItem.relation4 ? currentItem.relation4.replace(header.status, Constants.STATUS.CLOSED) : undefined;
@@ -119,6 +122,7 @@ class Service extends BaseObject {
             relation4: item.relation4,
             associateIn: item.associateIn,
             associateQuantity: item.associateQuantity,
+            associateQuantityOut: item.associateQuantityOut,
         };
         const setAttributes = Object.keys(itemUpdate);
         return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
