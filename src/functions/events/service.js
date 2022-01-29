@@ -104,7 +104,16 @@ class Service extends BaseObject {
                 const currentItem = items.find(elem => elem.item === item.item);
                 currentItem.associateQuantityOut = currentItem.associateQuantityOut ? currentItem.associateQuantityOut += item.quantity : item.quantity;
                 currentItem.associateOut ? currentItem.associateOut.push(associatePK) : currentItem.associateOut = [associatePK];
+                if ((currentItem.quantity - (currentItem.associateQuantity || 0) - (currentItem.associateQuantityOut || 0)) <= 0.001) {
+                    currentItem.outLimit = true;
+                }
                 transactionOperations.push(this.createItemUpdateOperationOut(currentItem, header.PK));
+            }
+
+            const outItems = items.filter(item => !item.outLimit);
+
+            if (!outItems.length) {
+                header.outLimit = true;
             }
 
             transactionOperations.push(this.createRequisitionObjectOut(header))
@@ -143,6 +152,7 @@ class Service extends BaseObject {
         const itemUpdate = {
             associateOut: item.associateOut,
             associateQuantityOut: item.associateQuantityOut,
+            outLimit: item.outLimit,
         };
         const setAttributes = Object.keys(itemUpdate);
         return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
@@ -151,6 +161,7 @@ class Service extends BaseObject {
     createRequisitionObjectOut(payload) {
         const item = {
             associateOut: payload.associateOut,
+            outLimit: payload.outLimit,
         };
         const setAttributes = Object.keys(item);
         return this.dao.createUpdateParams(this.table, payload.PK, payload.PK, item, setAttributes);
