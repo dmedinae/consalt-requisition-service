@@ -29,7 +29,7 @@
                 "properties": {
                     "SK": {
                         "type": "string",
-                        "pattern": "^ITRQ[0-9]+$",
+                        "pattern": "^ITEM[0-9]+$",
                         "maxLength": 11
                     },
                     "item": {

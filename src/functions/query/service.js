@@ -35,16 +35,8 @@ class Service extends BaseObject {
         try {
             const searchParameters = this.createSearchParameters();
             const permission = await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, this.actions);
-            if (permission === "OWNS") {
-                searchParameters.parameters.push({
-                    name: "creationUser",
-                    value: this.tokenData["cognito:username"],
-                    operator: "FILTER",
-                    filterOperator: "=",
-                });
-            }
             let result;
-            const data = await this.dao.query(this.table, searchParameters);
+            const data = await this.dao.query(this.table, searchParameters, permission);
             /*
             if ((this.tokenData.profile == "PROF4" || this.tokenData.profile == "PROF5" || this.tokenData.profile == "PROF6" || this.tokenData.profile == "PROF7") && !this.event.body.project){
                 let params = {

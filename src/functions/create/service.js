@@ -82,12 +82,9 @@ class Service extends BaseObject {
             const PK = await this.dao.getId(this.table, Constants.ENTITY);
             body.PK = PK;
 
-            let PKITEM = await this.dao.getId(this.table, Constants.ENTITY_ITRQ, body.items.length);
-
             // Se validan los items y se crean las operaciones en lotes
             let itemsPromises = [];
             for (let i = 0; i < body.items.length; i++) {
-                body.items[i].SK = `${Constants.ENTITY_ITRQ}${PKITEM}`;
                 body.items[i].project = body.project;
                 body.items[i].creationDate = body.creationDate;
                 body.items[i].relation1 = body.relation1;
@@ -97,7 +94,6 @@ class Service extends BaseObject {
                 itemsPromises.push(
                     this.createItemOperation(body.items[i], PK, project.frameProject)
                 )
-                PKITEM++;
                 if (itemsPromises.length >= 5 || i === (body.items.length - 1)) {
                     const resultItems = await Promise.all(itemsPromises).catch(error => {
                         this.createLog("error", "Service error", error);
@@ -165,7 +161,7 @@ class Service extends BaseObject {
      createItemObject(PK, item) {
         return {
             PK: PK,
-            SK: item.SK,
+            SK: item.item,
             entity: Constants.ENTITY_ITRQ,
             relation1: item.relation1,
             relation2: item.relation2,

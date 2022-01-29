@@ -80,10 +80,6 @@ class Service extends BaseObject {
             body.relation3 = header.relation3.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
             body.relation4 = header.relation4.replace(header.status, Constants.STATUS.PENDING_APPROVAL);
 
-            // Se obtienen los items a crear
-            const itemsForCreate = body.items.filter(item => !item.SK);
-            let PKITEM = itemsForCreate.length ? await this.dao.getId(this.table, Constants.ENTITY_ITRQ, itemsForCreate.length) : undefined;
-
             // Se consulta el projecto
             const project = await this.dao.get(this.table, header.project, header.project, "name,frameProject");
             if (!project) {
@@ -105,11 +101,9 @@ class Service extends BaseObject {
                     if (body.items[i].SK) {
                         transactionOperations.push(this.createItemUpdateOperation(body.items[i], PK))
                     } else {
-                        body.items[i].SK = `${Constants.ENTITY_ITRQ}${PKITEM}`;
                         itemsPromises.push(
                             this.createItemOperation(body.items[i], PK, project.frameProject)
                         )
-                        PKITEM++;
                     }
                 }
                 if (itemsPromises.length && itemsPromises.length >= 5 || i === (body.items.length - 1)) {
@@ -209,7 +203,7 @@ class Service extends BaseObject {
         const creationDate = moment.tz(new Date(), "America/Bogota").format("YYYY-MM-DD");
         return {
             PK: PK,
-            SK: item.SK,
+            SK: item.item,
             entity: Constants.ENTITY_ITRQ,
             relation1: item.relation1,
             relation2: item.relation2,
