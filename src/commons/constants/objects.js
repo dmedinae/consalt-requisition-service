@@ -16,7 +16,7 @@ const OBJECTS = Object.freeze({
     SEARCH_PROJECTION: "PK,creationDate,project,status,projectName,creatorName",
     REPORT_PROJECTION: "PK,project,projectName,creatorName,creationDate,requireDate,approveDate,motive,request,associateOut,associateOrder,associateIn,status",
     REPORT_ITEMS_PROJECTION: "PK,project,creatorName,code,name,quantity,associateRequest,associateOut,associateOrder,associateIn",
-    PK_PROJECTION: "PK,SK,creationUser,creatorName,creatorAreaName,creatorPositionName,approveDate,approverName,frame,frameName,project,projectName,projectCostCenter,creationDate,requireDate,motive,observations,fileExtension,status,item,code,name,unity,unityName,quantity,associateQuantity,associateQuantityOut"
+    PK_PROJECTION: "PK,SK,creationUser,creatorName,creatorAreaName,creatorPositionName,approveDate,approverName,frame,frameName,project,projectName,projectCostCenter,creationDate,requireDate,motive,observations,fileExtension,status,item,code,name,unity,unityName,quantity,associateQuantity,associateQuantityOut,outLimit"
 });
 
 module.exports = OBJECTS;
