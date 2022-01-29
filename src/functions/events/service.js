@@ -57,7 +57,7 @@ class Service extends BaseObject {
                 if (currentItem.associateQuantityOut && this.event.comeFromRequisitionOut) {
                     currentItem.associateQuantityOut -= item.quantity;
                 }
-                if (currentItem.associateQuantity === currentItem.quantity) {
+                if (currentItem.associateQuantity >= currentItem.quantity) {
                     currentItem.relation3 = currentItem.relation3.replace(header.status, Constants.STATUS.CLOSED);
                     currentItem.relation4 = currentItem.relation4 ? currentItem.relation4.replace(header.status, Constants.STATUS.CLOSED) : undefined;
                 }
