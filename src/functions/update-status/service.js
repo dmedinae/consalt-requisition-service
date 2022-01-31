@@ -45,7 +45,7 @@ class Service extends BaseObject {
             const params = {
                 indexName: "",
                 parameters: [{ name: "PK", value: body.PK, operator: "=" }],
-                projectionExpression: "PK,SK,project,status,relation3,relation4,family,group,value,quantity,creationDate,creationUser"
+                projectionExpression: "PK,SK,project,status,relation3,relation4,family,group,value,quantity,creationDate,creationUser,affectBudget"
             };
             const current = await this.dao.query(this.table, params);
             if (!current.length) {
