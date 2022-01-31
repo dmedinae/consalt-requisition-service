@@ -1,0 +1,37 @@
+{
+    "name": "register-service",
+    "version": "1.0.0",
+    "description": "Microservices for users managment",
+    "main": "serverless.yml",
+    "scripts": {
+        "test": "env-cmd -f ./test/.env nyc --all --reporter=lcov --reporter=text-summary mocha test/**/*spec.js --reporter=nyan"
+    },
+    "keywords": [
+        "users"
+    ],
+    "author": "Duban Medina",
+    "license": "ISC",
+    "devDependencies": {
+        "aws-sdk-mock": "^5.0.0",
+        "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
+        "env-cmd": "^10.1.0",
+        "mocha": "^7.0.1",
+        "nyc": "^15.0.0",
+        "rewiremock": "^3.13.9",
+        "serverless-plugin-optimize": "^4.1.4-rc.1",
+        "serverless-prune-plugin": "^1.4.2",
+        "serverless-plugin-log-retention": "^2.0.0",
+        "serverless-plugin-resource-tagging": "^1.1.1",
+        "sinon": "^9.0.0",
+        "sinon-chai": "^3.5.0"
+    },
+    "dependencies": {
+        "@inlaweb/base-node": "^1.0.0",
+        "@inlaweb/consalt-utils-node": "^1.0.1",
+        "ajv": "^7.2.3",
+        "aws-sdk": "^2.623.0",
+        "jsonwebtoken": "^8.5.1",
+        "moment-timezone": "^0.5.28"
+    }
+}

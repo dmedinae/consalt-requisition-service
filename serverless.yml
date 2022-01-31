@@ -1,0 +1,198 @@
+service: consalt-requisition-service
+
+plugins:
+  - serverless-prune-plugin
+  - serverless-plugin-optimize
+  - serverless-plugin-log-retention
+  - serverless-plugin-resource-tagging
+
+package:
+  individually: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage}
+  region: us-east-1
+  timeout: 10
+  memorySize: 512
+  lambdaHashingVersion: "20201221"
+  stackTags:
+    "serverless:company": consalt
+    "serverless:service": consalt-requisition-service
+    "serverless:stage": ${opt:stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
+          Resource:
+            - 'Fn::ImportValue': consalt-${self:provider.stage}-DBARN
+            - 'Fn::ImportValue': consalt-audit-${self:provider.stage}-DBARN
+            - 'Fn::ImportValue': consalt-permission-${self:provider.stage}-DBARN
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+          Resource:
+            - 'Fn::ImportValue': consalt-${self:provider.stage}-DBIndexARN
+            - 'Fn::ImportValue': consalt-permission-${self:provider.stage}-DBIndexARN
+        - Effect: Allow
+          Action:
+            - s3:*
+          Resource: "arn:aws:s3:::${self:provider.stage}-consalt-files/*"
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+          Resource:
+            - 'Fn::Sub': "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:consalt-request-service-${self:provider.stage}-create"
+            - 'Fn::Sub': "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:consalt-out-service-${self:provider.stage}-create"
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+          Resource:
+            - 'Fn::Sub': "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:consalt-${self:provider.stage}-budget"
+            - 'Fn::Sub': "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:consalt-${self:provider.stage}-email"
+  deploymentBucket:
+    name: ${self:provider.stage}-serverless-stacks
+  httpApi:
+    id:
+      'Fn::ImportValue': consalt-${self:provider.stage}-ApiID
+  environment:
+    TABLE_ARN:
+      'Fn::ImportValue': consalt-${self:provider.stage}-DBARN
+    TABLE_NAME:
+      'Fn::ImportValue': consalt-${self:provider.stage}-DBName
+    TABLE_PERMISSIONS_ARN:
+      'Fn::ImportValue': consalt-permission-${self:provider.stage}-DBARN
+    TABLE_PERMISSIONS_NAME:
+      'Fn::ImportValue': consalt-permission-${self:provider.stage}-DBName
+    TABLE_AUDIT_ARN:
+      'Fn::ImportValue': consalt-audit-${self:provider.stage}-DBARN
+    TABLE_AUDIT_NAME:
+      'Fn::ImportValue': consalt-audit-${self:provider.stage}-DBName
+    POOL_ID:
+      'Fn::ImportValue': consalt-${self:provider.stage}-Pool-ID
+    APP_ID:
+      'Fn::ImportValue': consalt-${self:provider.stage}-APP-ID
+    LAMBDA_REQUEST_CREATE: consalt-request-service-${self:provider.stage}-create
+    LAMBDA_OUT_CREATE: consalt-out-service-${self:provider.stage}-create
+    BUCKET_NAME: ${self:provider.stage}-consalt-files
+    SQS_MAIL:
+      'Fn::Sub': "https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/consalt-${self:provider.stage}-email"
+    SQS_PROJECT_BUDGET:
+      'Fn::Sub': "https://sqs.${AWS::Region}.amazonaws.com/${AWS::AccountId}/consalt-${self:provider.stage}-budget"
+    LOG_LEVEL: debug
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+
+functions:
+  create:
+    handler:  src/functions/create/handler.create
+    description: Microservice for creation of a requisition
+    events:
+      - httpApi:
+          path: /v1/requisition
+          method: put
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
+  query:
+    handler:  src/functions/query/handler.query
+    description: Microservice for query the requisition entity
+    events:
+      - httpApi:
+          path: /v1/requisition
+          method: post
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
+  update:
+    handler:  src/functions/update/handler.update
+    description: Microservice for update a requisition
+    events:
+      - httpApi:
+          path: /v1/requisition
+          method: patch
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
+  ready-approve:
+    handler:  src/functions/ready-approve/handler.readyApprove
+    description: Microservice for get the ready to approve requisitions for the auth user
+    events:
+      - httpApi:
+          path: /v1/requisition/ready-approve
+          method: get
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
+  update-status:
+    handler:  src/functions/update-status/handler.updateStatus
+    description: Microservice for update the requisition status
+    events:
+      - httpApi:
+          path: /v1/requisition/update-status
+          method: patch
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
+  ready-proccess:
+    handler:  src/functions/ready-proccess/handler.readyProccess
+    description: Microservice for get the ready to process requisitions for the auth user
+    events:
+      - httpApi:
+          path: /v1/requisition/ready-proccess
+          method: get
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
+  query-proccess:
+    handler:  src/functions/query-proccess/handler.queryProccess
+    description: Microservice for get the ready to process requisition with inventory quantities
+    events:
+      - httpApi:
+          path: /v1/requisition/query-proccess
+          method: post
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
+  proccess:
+    handler:  src/functions/proccess/handler.proccess
+    description: Microservice for process requisition
+    events:
+      - httpApi:
+          path: /v1/requisition/proccess
+          method: post
+          authorizer:
+            id:
+              "Fn::ImportValue": consalt-${self:provider.stage}-AuthorizerID
+
+  events:
+    handler:  src/functions/events/handler.events
+    description: Microservice for requisition events
+    memorySize: 1024
+
+resources:
+  Description: functions stack for the requisition service
+
+custom:
+    logRetentionInDays: 14
+    optimize:
+      global: true
+
+    prune:
+      automatic: true
+      number: 1
