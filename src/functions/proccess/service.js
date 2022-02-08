@@ -79,17 +79,27 @@ class Service extends BaseObject {
             // Validate quantities
             for (let item of items) {
                 let recieveItem = body.items.find(elem => elem.item === item.item);
-                if (!recieveItem || (item.quantity < recieveItem.out + recieveItem.request)) {
+                if (!recieveItem || (item.quantity < recieveItem.out + recieveItem.outTool + recieveItem.request)) {
                     throw this.createResponse("INVALID_REQUEST", null, {});
                 }
 
-                recieveItem.bag = item.quantity - recieveItem.out - recieveItem.request;
+                recieveItem.bag = item.quantity - recieveItem.out - recieveItem.outTool - recieveItem.request;
                 item.associateQuantityOut = 0;
 
                 if (recieveItem.out > 0) {
                     itemsOut.push({
+                        PK: frame.PK.replace("FRAM", "INVF"),
                         item: item.item,
                         quantity: recieveItem.out
+                    });
+                    item.associateOut = item.associateOut ? item.associateOut : [];
+                }
+
+                if (recieveItem.outTool > 0) {
+                    itemsOut.push({
+                        PK: frame.PK.replace("FRAM", "INVT"),
+                        item: item.item,
+                        quantity: recieveItem.outTool
                     });
                     item.associateOut = item.associateOut ? item.associateOut : [];
                 }

@@ -57,6 +57,7 @@ class Service extends BaseObject {
             const project = await this.dao.get(this.table, header.project, header.project, "storer,frameProject");
             const frame = project.frameProject ? await this.dao.get(this.table, project.frameProject, project.frameProject, "storer") : undefined;
             let inventoryPK = project.frameProject ? project.frameProject.replace("FRAM", "INVF") : header.project.replace("PROJ", "INVP");
+            let inventoryTool = project.frameProject ? project.frameProject.replace("FRAM", "INVT") : undefined;
 
             if ((frame && frame.storer !== this.tokenData["custom:id"]) || (!frame && project.storer !== this.tokenData["custom:id"])) {
                 throw this.createResponse("INVALID_REQUEST", null, {});
@@ -66,7 +67,7 @@ class Service extends BaseObject {
 
             let itemsPromises = [];
             for (let i = 0; i < items.length; i++) {
-                itemsPromises.push(this.addInventoryAvailableQuantityToItem(items[i], inventoryPK));
+                itemsPromises.push(this.addInventoryAvailableQuantityToItem(items[i], inventoryPK, inventoryTool));
                 if (itemsPromises.length >= 10 || i === (items.length - 1)) {
                     await Promise.all(itemsPromises).catch(error => {
                         this.createLog("error", "Service error", error);
@@ -82,14 +83,12 @@ class Service extends BaseObject {
         }
     }
 
-    async addInventoryAvailableQuantityToItem(item, PK) {
+    async addInventoryAvailableQuantityToItem(item, PK, PKTool) {
         let inventoryItem = await this.dao.get(this.table, PK, item.item, "quantity");
-        if (!inventoryItem) {
-            inventoryItem = {
-                quantity: 0
-            }
-        }
-        item.inventoryQuantity = inventoryItem.quantity;
+        item.inventoryQuantity = inventoryItem ? inventoryItem.quantity : 0;
+
+        let inventoryItemTool = await this.dao.get(this.table, PKTool, item.item, "quantity");
+        item.inventoryQuantityTool = inventoryItemTool ? inventoryItemTool.quantity : 0;
     }
 }
 

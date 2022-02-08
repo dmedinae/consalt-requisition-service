@@ -100,14 +100,18 @@ class Service extends BaseObject {
 
             header.associateOut ? header.associateOut.push(associatePK) : header.associateOut = [associatePK];
 
+            let processItems = [];
             for (let item of this.event.items) {
-                const currentItem = items.find(elem => elem.item === item.item);
-                currentItem.associateQuantityOut = currentItem.associateQuantityOut ? currentItem.associateQuantityOut += item.quantity : item.quantity;
-                currentItem.associateOut ? currentItem.associateOut.push(associatePK) : currentItem.associateOut = [associatePK];
-                if ((currentItem.quantity - (currentItem.associateQuantity || 0) - (currentItem.associateQuantityOut || 0)) <= 0.001) {
-                    currentItem.outLimit = true;
+                if (!processItems.includes(item.item)) {
+                    const currentItem = items.find(elem => elem.item === item.item);
+                    currentItem.associateQuantityOut = currentItem.associateQuantityOut ? currentItem.associateQuantityOut += item.quantity : item.quantity;
+                    currentItem.associateOut ? currentItem.associateOut.push(associatePK) : currentItem.associateOut = [associatePK];
+                    if ((currentItem.quantity - (currentItem.associateQuantity || 0) - (currentItem.associateQuantityOut || 0)) <= 0.001) {
+                        currentItem.outLimit = true;
+                    }
+                    transactionOperations.push(this.createItemUpdateOperationOut(currentItem, header.PK));
+                    processItems.push(item.item);
                 }
-                transactionOperations.push(this.createItemUpdateOperationOut(currentItem, header.PK));
             }
 
             const outItems = items.filter(item => !item.outLimit);
