@@ -28,10 +28,14 @@
                     "out": {
                         "type": "number",
                         "minimum": 0
+                    },
+                    "outTool": {
+                        "type": "number",
+                        "minimum": 0
                     }
                 },
                 "additionalProperties": false,
-                "required": ["item", "request", "out"]
+                "required": ["item", "request", "out", "outTool"]
             }
         }
     },
