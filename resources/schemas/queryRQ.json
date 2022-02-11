@@ -51,7 +51,7 @@
                     "maxLength": 11
                 },
                 "status": {
-                    "enum": ["PENDING_APPROVAL","APPROVED","REJECTED","CANCELED","CLOSED"]
+                    "enum": ["PENDING_APPROVAL","APPROVED","REJECTED","CANCELED","PROCCESS","CLOSED"]
                 },
                 "startDate": {
                     "type": "string",
