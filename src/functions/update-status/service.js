@@ -36,8 +36,8 @@ class Service extends BaseObject {
      */
     async updateStatus() {
         try {
-            // Se valida permiso a la opción de creación
-            await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, ["APPROVE"]);
+            const permission = this.tokenData.profile == "PROF9" ? "ANNUL" : "APPROVE";
+            await this.dao.validatePermissions(this.permissionTable, Constants.ENTITY, [permission]);
 
             const transactionOperations = [];
             const body = this.event.body;
@@ -55,8 +55,14 @@ class Service extends BaseObject {
             const header = current.find(element => element.PK === element.SK);
             const project = await this.dao.get(this.table, header.project, header.project, "projectManager");
 
-            if(header.status !== Constants.STATUS.PENDING_APPROVAL || project.projectManager !== this.tokenData["custom:id"]) {
-                throw this.createResponse("INVALID_REQUEST", null, {});
+            if (this.tokenData.profile == "PROF9"){
+                if(header.status !== Constants.STATUS.APPROVED) {
+                    throw this.createResponse("INVALID_REQUEST", null, {});
+                }
+            } else{
+                if(header.status !== Constants.STATUS.PENDING_APPROVAL || project.projectManager !== this.tokenData["custom:id"]) {
+                    throw this.createResponse("INVALID_REQUEST", null, {});
+                }
             }
             // Se completan datos en el header
             body.relation3 = header.relation3.replace(header.status, body.status);
@@ -74,7 +80,7 @@ class Service extends BaseObject {
             transactionOperations.push(this.createRequisitionObject(body))
 
             await this.dao.writeTransactions(transactionOperations, 24);
-            await this.dao.audit(Constants.ENTITY, body.PK, "APPROVE");
+            await this.dao.audit(Constants.ENTITY, body.PK, permission);
 
             if (body.status !== Constants.STATUS.APPROVED) {
                 await Utils.updateProjectBudget(Constants.ENTITY, undefined, current);
