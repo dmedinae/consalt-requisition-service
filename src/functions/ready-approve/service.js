@@ -41,20 +41,20 @@ class Service extends BaseObject {
 
             // Query for projects where user is manager
             let params = {
-                indexName: "GSI4",
+                indexName: "GSI5",
                 parameters: [
                     { name: "entity", value: "PROJ", operator: "=" },
-                    { name: "relation4", value: `${this.tokenData["custom:id"]}|`, operator: "begins_with" }
+                    { name: "relation5", value: `${this.tokenData["custom:id"]}|`, operator: "begins_with" }
                 ],
                 projectionExpression: "PK"
             };
-            const projectsWhereUserIsManager = await this.dao.query(this.table, params);
+            const projectsWhereUserIsController = await this.dao.query(this.table, params);
 
-            if (!projectsWhereUserIsManager.length ) {
+            if (!projectsWhereUserIsController.length ) {
                 return [];
             }
 
-            for (let project of projectsWhereUserIsManager) {
+            for (let project of projectsWhereUserIsController) {
                 params = {
                     indexName: "GSI3",
                     parameters: [
