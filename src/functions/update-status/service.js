@@ -53,14 +53,14 @@ class Service extends BaseObject {
             }
 
             const header = current.find(element => element.PK === element.SK);
-            const project = await this.dao.get(this.table, header.project, header.project, "projectManager");
+            const project = await this.dao.get(this.table, header.project, header.project, "controller");
 
             if (this.tokenData.profile == "PROF9"){
                 if(header.status !== Constants.STATUS.APPROVED) {
                     throw this.createResponse("INVALID_REQUEST", null, {});
                 }
             } else{
-                if(header.status !== Constants.STATUS.PENDING_APPROVAL || project.projectManager !== this.tokenData["custom:id"]) {
+                if(header.status !== Constants.STATUS.PENDING_APPROVAL || project.controller !== this.tokenData["custom:id"]) {
                     throw this.createResponse("INVALID_REQUEST", null, {});
                 }
             }
