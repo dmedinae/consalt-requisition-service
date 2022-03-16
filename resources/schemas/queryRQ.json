@@ -18,10 +18,13 @@
             "properties": {
                 "id": {
                     "type": "number"
+                },
+                "typeSearch": {
+                    "enum": ["S", "R"]
                 }
             },
             "additionalProperties": false,
-            "required": ["id"]
+            "required": ["id", "typeSearch"]
         },
         {
             "properties": {
