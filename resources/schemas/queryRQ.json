@@ -16,6 +16,15 @@
         },
         {
             "properties": {
+                "id": {
+                    "type": "number"
+                }
+            },
+            "additionalProperties": false,
+            "required": ["id"]
+        },
+        {
+            "properties": {
                 "typeSearch": {
                     "enum": ["S", "R"]
                 },
