@@ -116,7 +116,10 @@ class Service extends BaseObject {
             ];
         } else if (this.event.body.id) {
             searchParameters.indexName = "";
-            searchParameters.parameters = [{ name: "PK", value: `REQI${this.event.body.id}`, operator: "=" }];
+            searchParameters.parameters = [
+                { name: "PK", value: `REQI${this.event.body.id}`, operator: "=" }, 
+                { name: "SK", value: `REQI${this.event.body.id}`, operator: "=" }
+            ];
         } else if (this.event.body.PK) {
             searchParameters.projectionExpression = Constants.PK_PROJECTION;
             searchParameters.indexName = "";
