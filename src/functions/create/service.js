@@ -183,6 +183,7 @@ class Service extends BaseObject {
             unityName: item.unityName,
             value: item.value,
             quantity: item.quantity,
+            time: item.time,
             affectBudget: item.affectBudget,
             creatorName: this.tokenData.name,
             creationUser: this.tokenData["cognito:username"],

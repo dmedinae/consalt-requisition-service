@@ -20,6 +20,10 @@
                         "pattern": "^ITEM[0-9]+$",
                         "maxLength": 11
                     },
+                    "time": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                    },
                     "request": {
                         "type": "number",
                         "minimum": 0

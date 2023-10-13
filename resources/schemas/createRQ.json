@@ -35,6 +35,10 @@
                     "quantity": {
                         "type": "number",
                         "exclusiveMinimum": 0
+                    },
+                    "time": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
                     }
                 },
                 "additionalProperties": false,

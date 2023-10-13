@@ -107,7 +107,8 @@ class Service extends BaseObject {
                 if (recieveItem.request > 0) {
                     itemsRequest.push({
                         item: item.item,
-                        quantity: recieveItem.request
+                        quantity: recieveItem.request,
+                        time: recieveItem.time
                     });
                     item.associateRequest = item.associateRequest ? item.associateRequest : [];
                 }
@@ -130,7 +131,8 @@ class Service extends BaseObject {
                         unityName: item.unityName,
                         affectBudget: item.affectBudget,
                         value: item.value,
-                        quantity: recieveItem.bag
+                        quantity: recieveItem.bag,
+                        time: recieveItem.time
                     });
                     item.bagQuantity = recieveItem.bag
                 }

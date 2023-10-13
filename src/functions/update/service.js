@@ -160,7 +160,8 @@ class Service extends BaseObject {
             relation2: item.relation2,
             relation3: item.relation3,
             relation4: item.relation4,
-            quantity: item.quantity
+            quantity: item.quantity,
+            time: item.time,
         };
         const setAttributes = Object.keys(item);
         return this.dao.createUpdateParams(this.table, PK, item.SK, itemUpdate, setAttributes);
@@ -225,6 +226,7 @@ class Service extends BaseObject {
             unityName: item.unityName,
             value: item.value,
             quantity: item.quantity,
+            time: item.time,
             affectBudget: item.affectBudget,
             creatorName: this.tokenData.name,
             creationUser: this.tokenData["cognito:username"],

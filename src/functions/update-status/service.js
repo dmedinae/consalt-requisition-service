@@ -56,7 +56,7 @@ class Service extends BaseObject {
             const project = await this.dao.get(this.table, header.project, header.project, "controller");
 
             if (this.tokenData.profile == "PROF9"){
-                if(header.status !== Constants.STATUS.APPROVED) {
+                if(header.status !== Constants.STATUS.APPROVED || header.request || header.out) {
                     throw this.createResponse("INVALID_REQUEST", null, {});
                 }
             } else{
